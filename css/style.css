@@ -152,6 +152,18 @@ body.night #foot { color: rgba(230,235,245,.6); text-shadow: none; }
 .speedo span { font-size: 40px; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1; }
 .speedo small { font-size: 13px; opacity: .7; }
 .speedo em { font-style: normal; font-weight: 700; font-size: 14px; margin-left: 8px; padding: 2px 7px; border-radius: 6px; background: rgba(255,255,255,.14); }
+.speedo { flex-wrap: wrap; }
+.boostbar { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; margin-top: 7px; }
+.boostbar b { font-size: 10.5px; letter-spacing: .12em; opacity: .75; font-weight: 750; }
+.boostbar .track { flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,.16); overflow: hidden; }
+.boostbar i { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(1); background: linear-gradient(90deg, #ff7a1f, #ffd04a); border-radius: 4px; }
+.boostbar.on i { background: linear-gradient(90deg, #ffb347, #fff3c0); box-shadow: 0 0 8px #ffa640; }
+.boostbar.low i { background: #d8452f; }
+#drive-timer { position: absolute; top: calc(14px + var(--safe-t)); left: calc(16px + var(--safe-l)); background: rgba(20,28,24,.78); color: #f6f3ea; border-radius: 12px; padding: 7px 13px; font-size: 20px; font-weight: 750; font-variant-numeric: tabular-nums; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+#drive-timer[hidden] { display: none; }
+#drive-toast { position: absolute; left: 50%; top: 24%; transform: translate(-50%, 0) scale(.9); opacity: 0; pointer-events: none; white-space: nowrap; font-size: 34px; font-weight: 850; letter-spacing: .02em; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,.55), 0 0 2px rgba(0,0,0,.8); transition: opacity .25s, transform .25s; }
+#drive-toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+#drive-toast.summit { color: #ffd34d; font-size: 44px; }
 .drive-top { position: absolute; top: calc(14px + var(--safe-t)); right: calc(16px + var(--safe-r)); display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .pill { border: 0; background: var(--paper); box-shadow: var(--shadow); border-radius: 999px; padding: 11px 16px; font-size: 14px; font-weight: 650; cursor: pointer; min-height: 44px; }
 .pill.accent { background: var(--accent); color: var(--accent-ink); }
@@ -168,7 +180,10 @@ body.touch .drive-help { display: none; }
 #touch-drive .gas { height: 112px; background: rgba(47,93,70,.9); }
 #touch-drive .brake { height: 80px; background: rgba(181,86,47,.9); }
 #touch-drive button.held { transform: scale(0.94); filter: brightness(1.15); }
+#touch-drive .boost { position: absolute; right: calc(14px + var(--safe-r)); bottom: calc(142px + var(--safe-b)); width: 160px; height: 54px; border-radius: 16px; font-weight: 850; font-size: 15px; letter-spacing: .1em; color: #fff; background: linear-gradient(180deg, rgba(255,140,40,.95), rgba(214,84,30,.95)); box-shadow: var(--shadow); }
 body.touch .speedo { bottom: auto; top: calc(70px + var(--safe-t)); }
+body.touch #drive-toast { font-size: 26px; top: 30%; }
+body.touch #drive-toast.summit { font-size: 32px; }
 
 body.driving #brand, body.driving #views, body.driving #quick, body.driving #panel, body.driving #foot { display: none; }
 

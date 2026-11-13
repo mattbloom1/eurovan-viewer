@@ -212,9 +212,9 @@ export class UI {
     // ---------------- Drive ----------------
     const dr = document.querySelector('[data-pane=drive]');
     const gDr = this.group('Take it for a spin');
-    gDr.append(h('p', { class: 'note', style: 'margin:0 0 12px;font-size:13.5px;color:var(--ink-2)' }, 'Drive the van around a parking lot with rolling hills. Doors and the pop-top close automatically before you set off.'));
+    gDr.append(h('p', { class: 'note', style: 'margin:0 0 12px;font-size:13.5px;color:var(--ink-2)' }, 'Drive the van around a parking lot with rolling hills, jump ramps and a mountain road to climb. Doors and the pop-top close automatically before you set off.'));
     gDr.append(h('button', { class: 'btn primary wide', style: 'width:100%', onclick: () => a.enterDrive() }, 'Start driving'));
-    gDr.append(h('p', { class: 'note' }, 'Keyboard: W / ↑ gas, S / ↓ brake then reverse, A D / ← → steer, Space handbrake, C camera, R reset, Esc exit. On a phone, use the on-screen pedals and steering buttons.'));
+    gDr.append(h('p', { class: 'note' }, 'Keyboard: W / ↑ gas, S / ↓ brake then reverse, A D / ← → steer, Space handbrake, Shift boost, C camera, R reset, Esc exit. On a phone, use the on-screen pedals and steering buttons.'));
     dr.append(gDr);
 
     this.sync();

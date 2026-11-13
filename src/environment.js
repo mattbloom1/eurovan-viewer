@@ -90,8 +90,8 @@ export class Environment {
   setBlobSize(w, l) { this.blob.scale.set(w * 1.35, 1, l * 1.2); }
 
   setDriveFog(on) {
-    this.scene.fog.near = on ? 70 : 35;
-    this.scene.fog.far = on ? 380 : 130;
+    this.scene.fog.near = on ? 90 : 35;
+    this.scene.fog.far = on ? 560 : 130;
     this.ground.visible = !on;
   }
 

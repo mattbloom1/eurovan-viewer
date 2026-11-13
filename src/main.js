@@ -290,6 +290,17 @@ function isVisible(o) { for (; o; o = o.parent) if (!o.visible) return false; re
 // ---------------------------------------------------------------- drive mode UI
 const hud = document.getElementById('drive-hud');
 const mphEl = document.getElementById('mph'), gearEl = document.getElementById('gear'), camBtn = document.getElementById('btn-cam');
+const boostBar = document.getElementById('boostbar'), boostFill = document.getElementById('boost-fill'), timerEl = document.getElementById('drive-timer'), driveToast = document.getElementById('drive-toast');
+let toastTimer = 0, lastBoostPct = -1, lastTimerTxt = '';
+function showDriveToast(text, kind) {
+  clearTimeout(toastTimer);
+  if (!text) { driveToast.classList.remove('show', 'summit'); return; }
+  driveToast.textContent = text;
+  driveToast.classList.toggle('summit', kind === 'summit');
+  driveToast.classList.add('show');
+  toastTimer = setTimeout(() => driveToast.classList.remove('show'), kind === 'summit' ? 4500 : 2200);
+}
+const fmtTime = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 app.enterDrive = () => {
   if (!app.drive) return;
   app.openings.closeAll(true);
@@ -310,6 +321,7 @@ app.enterDrive = () => {
 app.exitDrive = () => {
   if (!app.drive || !app.drive.active) return;
   app.drive.exit();
+  lastTimerTxt = ''; lastBoostPct = -1; timerEl.hidden = true; showDriveToast(null);
   env.setDriveFog(false);
   env.setFocus(new THREE.Vector3(0, 0, 0));
   env.blob.position.set(0, 0.004, 0);
@@ -399,7 +411,8 @@ async function load() {
   app.lights = new VanLights(van, app.bounds);
   const wheels = {};
   for (const n of ['Wheel_FL', 'Wheel_FR', 'Wheel_RL', 'Wheel_RR']) if (app.nodes[n]) wheels[n] = app.nodes[n];
-  app.drive = new Drive({ scene, van, camera, controls, manifest, bounds: app.bounds, wheels });
+  app.drive = new Drive({ scene, van, camera, controls, manifest, bounds: app.bounds, wheels, renderer });
+  app.drive.onToast = showDriveToast;
   app.drive.bindTouch(document.getElementById('touch-drive'));
 
   // first visit: hide clutter collections by default
@@ -457,6 +470,11 @@ function tick() {
     const r = app.drive.update(raw);
     mphEl.textContent = Math.round(r.mph);
     gearEl.textContent = r.gear;
+    const bp = Math.round(r.boost * 100);
+    if (bp !== lastBoostPct) { lastBoostPct = bp; boostFill.style.transform = `scaleX(${r.boost.toFixed(3)})`; boostBar.classList.toggle('low', r.boost < 0.2); }
+    boostBar.classList.toggle('on', r.boosting);
+    const tt = r.timer < 0 ? '' : fmtTime(r.timer);
+    if (tt !== lastTimerTxt) { lastTimerTxt = tt; timerEl.hidden = !tt; timerEl.textContent = tt; }
     const b = r.braking ? 1 : 0;
     if (b !== lastBrake) { lastBrake = b; updateLights(b); }
     env.setFocus(app.van.position);
