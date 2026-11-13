@@ -717,7 +717,7 @@ export class Drive {
     // boost meter: ~4 s of full boost, ~6 s to refill; running dry locks it until the key is released
     const boostKey = this.input('boost');
     if (!boostKey) this.boostLock = false;
-    this.boosting = boostKey && !this.boostLock && this.boost > 0;
+    this.boosting = boostKey && !brake && !this.boostLock && this.boost > 0;
     if (this.boosting) { this.boost = Math.max(0, this.boost - dt / 4); if (this.boost === 0) { this.boostLock = true; this.boosting = false; } }
     else this.boost = Math.min(1, this.boost + dt / 6);
     const boosting = this.boosting;
@@ -780,7 +780,7 @@ export class Drive {
   _physicsStep(dt) {
     const gas = this.input('gas'), brake = this.input('brake'), boostKey = this.input('boost');
     if (!boostKey) this.boostLock = false;
-    this.boosting = boostKey && !this.boostLock && this.boost > 0;
+    this.boosting = boostKey && !brake && !this.boostLock && this.boost > 0;
     if (this.boosting) { this.boost = Math.max(0, this.boost - dt / 4); if (this.boost === 0) { this.boostLock = true; this.boosting = false; } }
     else this.boost = Math.min(1, this.boost + dt / 6);
     const r = this.physics.step({ gas, brake, boost: this.boosting, hand: this.input('hand'), left: this.input('left'), right: this.input('right') });
