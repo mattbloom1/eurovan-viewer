@@ -1,0 +1,82 @@
+// Cannon-es raycast vehicle on the same procedural height function as the visible course.
+import * as CANNON from '../vendor/cannon-es/cannon-es.js';
+
+const STEP = 1 / 60;
+const CENTRE_Y = 1.072;
+const LIMITS = { minX: -280, maxX: 400, minZ: -280, maxZ: 280 };
+const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+
+export class VehiclePhysics {
+  constructor(heightAt, wheels) {
+    this.heightAt = heightAt;
+    this.world = new CANNON.World({ gravity: new CANNON.Vec3(0, -12, 0) });
+    const heights = [];
+    // One collision field is prepared on entry; no terrain is rebuilt during a drive.
+    for (let x = -300; x <= 420; x++) {
+      const row = [];
+      for (let z = 300; z >= -300; z--) row.push(heightAt(x, z));
+      heights.push(row);
+    }
+    const ground = new CANNON.Body({ mass: 0, shape: new CANNON.Heightfield(heights, { elementSize: 1 }), position: new CANNON.Vec3(-300, 0, 300) });
+    ground.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+    this.world.addBody(ground);
+    ground.updateAABB(); // Wheel raycasts run before the first world step.
+    this.body = new CANNON.Body({ mass: 1600, shape: new CANNON.Box(new CANNON.Vec3(0.75, 0.36, 1.9)), linearDamping: 0.015, angularDamping: 0.45 });
+    this.vehicle = new CANNON.RaycastVehicle({ chassisBody: this.body, indexRightAxis: 0, indexUpAxis: 1, indexForwardAxis: 2 });
+    for (const w of wheels) this.vehicle.addWheel({
+      chassisConnectionPointLocal: new CANNON.Vec3(w.x, -0.4, w.z), directionLocal: new CANNON.Vec3(0, -1, 0), axleLocal: new CANNON.Vec3(-1, 0, 0),
+      radius: w.r, suspensionRestLength: 0.42, suspensionStiffness: 35, dampingRelaxation: 3, dampingCompression: 4.4,
+      frictionSlip: 5, rollInfluence: 0.02, maxSuspensionTravel: 0.3, isFrontWheel: w.front,
+    });
+    this.wheels = wheels;
+    this.vehicle.addToWorld(this.world);
+    this.forward = new CANNON.Vec3();
+    this.offset = new CANNON.Vec3();
+    this.reset();
+  }
+
+  reset(x = 0, z = 0, heading = 0, speed = 0) {
+    const b = this.body;
+    b.position.set(x, this.heightAt(x, z) + CENTRE_Y + 0.03, z);
+    b.quaternion.setFromEuler(0, heading, 0);
+    b.velocity.set(Math.sin(heading) * speed, 0, Math.cos(heading) * speed);
+    b.angularVelocity.set(0, 0, 0); b.force.set(0, 0, 0); b.torque.set(0, 0, 0);
+    b.wakeUp(); this.world.broadphase.dirty = true;
+    this.steer = 0; this.speed = speed; this.prevGrounded = true;
+  }
+
+  step(input) {
+    const b = this.body, vehicle = this.vehicle;
+    b.quaternion.vmult(new CANNON.Vec3(0, 0, 1), this.forward);
+    let speed = b.velocity.dot(this.forward);
+    const steerInput = (input.left ? 1 : 0) - (input.right ? 1 : 0);
+    const rate = steerInput ? 2.6 : 5;
+    this.steer += clamp(steerInput - this.steer, -rate * STEP, rate * STEP);
+    const steering = this.steer * (0.58 / (1 + speed * speed / 160));
+    let force = 0, brake = 0;
+    if (input.boost) force = speed < 52 ? -6000 : 0;
+    else if (input.gas) force = speed < 42 ? -1400 : 0;
+    if (input.brake) { if (speed > 0.5) brake = 120; else force = 1000; }
+    if (input.hand) brake = 200;
+    for (let i = 0; i < this.wheels.length; i++) {
+      vehicle.setSteeringValue(this.wheels[i].front ? steering : 0, i);
+      vehicle.applyEngineForce(force, i);
+      vehicle.setBrake(brake, i);
+    }
+    this.world.step(STEP);
+    b.position.x = clamp(b.position.x, LIMITS.minX, LIMITS.maxX);
+    b.position.z = clamp(b.position.z, LIMITS.minZ, LIMITS.maxZ);
+    b.quaternion.vmult(new CANNON.Vec3(0, 0, 1), this.forward);
+    speed = b.velocity.dot(this.forward);
+    this.speed = speed;
+    return { speed, grounded: vehicle.numWheelsOnGround > 0, heading: Math.atan2(this.forward.x, this.forward.z) };
+  }
+
+  applyVisual(van) {
+    const b = this.body;
+    b.quaternion.vmult(new CANNON.Vec3(0, CENTRE_Y, 0), this.offset);
+    van.position.set(b.position.x - this.offset.x, b.position.y - this.offset.y, b.position.z - this.offset.z);
+    van.quaternion.set(b.quaternion.x, b.quaternion.y, b.quaternion.z, b.quaternion.w);
+  }
+}
+
