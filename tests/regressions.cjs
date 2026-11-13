@@ -91,7 +91,7 @@ async function main() {
   vm.runInContext('let hourTween = { from: 14, to: 22, t: 0.5 };\n' + reset + '\napp.reset(); globalThis.result = { hourTween, hour: app.state.hour };', resetContext);
   assert.equal(resetContext.result.hourTween, null);
   assert.equal(resetContext.result.hour, 14);
-  console.log('Regression checks passed: shared state, keyboard inputs, reset, and fixed-step interpolation.');
+  console.log('Regression checks passed: shared state, keyboard and touch inputs, reset, and fixed-step interpolation.');
 }
 main().catch(err => { console.error(err); process.exitCode = 1; });
 
