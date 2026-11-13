@@ -35,8 +35,9 @@ async function main() {
   const handlers = {};
   const driveContext = vm.createContext({ console, window: { addEventListener: (name, fn) => { handlers[name] = fn; } } });
   const three = new vm.SyntheticModule([], () => {}, { context: driveContext });
+  const physicsStub = new vm.SyntheticModule(['VehiclePhysics'], function() { this.setExport('VehiclePhysics', class {}); }, { context: driveContext });
   const drive = new vm.SourceTextModule(fs.readFileSync('src/drive.js', 'utf8'), { context: driveContext });
-  await drive.link(() => three); await drive.evaluate();
+  await drive.link(specifier => specifier === 'three' ? three : physicsStub); await drive.evaluate();
   const car = Object.create(drive.namespace.Drive.prototype);
   Object.assign(car, { active: true, keys: new Set(), physicalKeys: new Set(), touch: {} });
   car._bindKeys();
