@@ -284,6 +284,7 @@ export class Drive {
     this.keys = new Set();
     this.physicalKeys = new Set();
     this.touch = {};
+    this._touchButtons = [];
     this.onToast = null;                 // (text|null, kind) => void, set by main.js
     // wheel geometry from manifest, falling back to the nodes / sensible defaults
     const mw = Array.isArray(manifest && manifest.wheels) ? manifest.wheels : [];
@@ -584,7 +585,7 @@ export class Drive {
     this.active = true;
     this.fov0 = this.camera.fov;
     this.reset();
-    this.keys.clear(); this.physicalKeys.clear(); this.touch = {};
+    this._clearInputs();
     this._place(0);
     this._snapCamera();
   }
@@ -592,7 +593,7 @@ export class Drive {
   exit() {
     this.active = false;
     if (this.world) this.world.visible = false;
-    this.keys.clear(); this.physicalKeys.clear(); this.touch = {};
+    this._clearInputs();
     this.boosting = false; this.boostVis = 0; this.flame = 0; this.air = false;
     this.run = { state: 'idle', t: 0 };
     if (this.fx) this._fxHide();
@@ -628,14 +629,25 @@ export class Drive {
       if (map[e.code]) { this.physicalKeys.add(e.code); e.preventDefault(); }
     });
     window.addEventListener('keyup', e => { if (map[e.code]) this.physicalKeys.delete(e.code); });
-    window.addEventListener('blur', () => { this.keys.clear(); this.physicalKeys.clear(); this.touch = {}; });
+    window.addEventListener('blur', () => this._clearInputs());
+  }
+
+  _clearInputs() {
+    this.keys.clear(); this.physicalKeys.clear(); this.touch = {};
+    for (const entry of this._touchButtons || []) { entry.pointers.clear(); entry.button.classList.remove('held'); }
   }
 
   bindTouch(root) {
     for (const b of root.querySelectorAll('[data-k]')) {
       const k = b.dataset.k;
-      const down = e => { e.preventDefault(); this.touch[k] = (this.touch[k] || 0) + 1; b.classList.add('held'); try { b.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ } };
-      const up = e => { if (b.classList.contains('held')) { this.touch[k] = 0; b.classList.remove('held'); } };
+      const entry = { button: b, key: k, pointers: new Set() };
+      this._touchButtons.push(entry);
+      const sync = () => {
+        this.touch[k] = this._touchButtons.filter(item => item.key === k).reduce((sum, item) => sum + item.pointers.size, 0);
+        b.classList.toggle('held', entry.pointers.size > 0);
+      };
+      const down = e => { e.preventDefault(); entry.pointers.add(e.pointerId); sync(); try { b.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ } };
+      const up = e => { entry.pointers.delete(e.pointerId); sync(); };
       b.addEventListener('pointerdown', down);
       b.addEventListener('pointerup', up);
       b.addEventListener('pointercancel', up);
@@ -767,8 +779,9 @@ export class Drive {
     else if (this.air) {
       this.air = false;
       if (this.airT > 0.12) this.airCount++;
-      this.lastAir = { t: this.airT, ft: Math.round(this.airDist * 3.28084) };
+      this.lastAir = { t: this.airT, ft: Math.round(this.airDist * 3.28084), impact: r.impactSpeed };
       this.maxAirT = Math.max(this.maxAirT, this.airT);
+      this._landingDust(r.impactSpeed);
       if (this.airT > 0.5 && this.onToast) this.onToast(`AIR ${this.airT.toFixed(1)} s / ${this.lastAir.ft} ft`, 'air');
       this.airT = 0; this.airDist = 0;
     }
@@ -861,7 +874,12 @@ export class Drive {
     if (t > 0.12) this.airCount++;
     this.lastAir = { t, ft: Math.round(this.airDist * 3.28084), impact };
     this.maxAirT = Math.max(this.maxAirT, t);
-    // dust puff at the wheels
+    this._landingDust(impact);
+    if (t > 0.5 && this.onToast) this.onToast(`AIR ${t.toFixed(1)} s / ${this.lastAir.ft} ft`, 'air');
+  }
+
+  _landingDust(impact) {
+    // Dust stays behind in world space after the van lands.
     const fx = this.fx;
     if (fx && this.active && impact > 2) {
       const ch = Math.cos(this.heading), sh = Math.sin(this.heading), fog = this.scene.fog ? this.scene.fog.color : null, n = Math.min(5, 1 + (impact / 3 | 0));
@@ -871,7 +889,6 @@ export class Drive {
         fx.smoke.emit(wx, heightAt(wx, wz) + 0.2, wz, Math.cos(a) * sp, 0.6 + Math.random() * 1.2, Math.sin(a) * sp, 0.8 + Math.random() * 0.7, 0.9, 3.2 + Math.random() * 1.5, 0.55, cr, cg, cb);
       }
     }
-    if (t > 0.5 && this.onToast) this.onToast(`AIR ${t.toFixed(1)} s / ${this.lastAir.ft} ft`, 'air');
   }
 
   _updateRun(dt) {
@@ -947,7 +964,9 @@ export class Drive {
     const p = this.van.position;
     cam.position.sub(this._shk);
     if (this.camMode === 'chase') {
-      const back = 7.2 + Math.max(0, this.v) * 0.06 + 2.6 * eb;
+      // A portrait viewport has a much narrower horizontal field of view.
+      const portraitDistance = clamp(1 / Math.sqrt(cam.aspect), 1, 1.65);
+      const back = (7.2 + Math.max(0, this.v) * 0.06 + 2.6 * eb) * portraitDistance;
       const des = new THREE.Vector3(p.x - fx * back, p.y + 2.7 + 0.4 * eb, p.z - fz * back);
       const ground = heightAt(des.x, des.z) + 1.2;
       des.y = Math.max(des.y, ground);
