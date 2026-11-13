@@ -33,13 +33,16 @@ function sanitize(obj) {
 }
 
 export function loadState() {
-  let stored = {}, fromHash = {};
+  let stored = {}, fromHash = null;
   try { stored = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (_) { stored = {}; }
   try {
     const m = location.hash.match(/[#&]c=([A-Za-z0-9_-]+)/);
-    if (m) fromHash = JSON.parse(b64urlDecode(m[1]));
-  } catch (_) { fromHash = {}; }
-  const s = { ...DEFAULTS, ...sanitize(stored), ...sanitize(fromHash) };
+    if (m) {
+      const parsed = JSON.parse(b64urlDecode(m[1]));
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) fromHash = parsed;
+    }
+  } catch (_) { fromHash = null; }
+  const s = { ...DEFAULTS, ...sanitize(fromHash === null ? stored : fromHash) };
   s.hidden = [...(s.hidden || [])];
   return s;
 }
@@ -60,7 +63,7 @@ export function saveState(s) {
     const d = diff(s);
     try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (_) { /* private mode etc. */ }
     try {
-      const hash = Object.keys(d).length ? '#c=' + b64urlEncode(JSON.stringify(d)) : '';
+      const hash = '#c=' + b64urlEncode(JSON.stringify(d));
       const url = location.pathname + location.search + hash;
       history.replaceState(null, '', url);
     } catch (_) { /* ignore */ }
@@ -69,10 +72,11 @@ export function saveState(s) {
 
 export function shareUrl(s) {
   const d = diff(s);
-  const hash = Object.keys(d).length ? '#c=' + b64urlEncode(JSON.stringify(d)) : '';
+  const hash = '#c=' + b64urlEncode(JSON.stringify(d));
   return location.origin + location.pathname + location.search + hash;
 }
 
 export function clearSaved() {
   try { localStorage.removeItem(KEY); } catch (_) { /* ignore */ }
 }
+

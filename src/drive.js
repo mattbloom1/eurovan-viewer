@@ -2,6 +2,7 @@
 // arcade bicycle-model physics with airborne phase, boost with flame jets, chase/driver/orbit cameras,
 // keyboard and multi-touch input.
 import * as THREE from 'three';
+import { VehiclePhysics } from './vehicle-physics.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
@@ -262,6 +263,7 @@ export class Drive {
     this.active = false;
     this.camMode = 'chase';
     this.keys = new Set();
+    this.physicalKeys = new Set();
     this.touch = {};
     this.onToast = null;                 // (text|null, kind) => void, set by main.js
     // wheel geometry from manifest, falling back to the nodes / sensible defaults
@@ -294,6 +296,7 @@ export class Drive {
   }
 
   reset() {
+    this._accumulator = 0; this._previousPose = null; this._currentPose = null; this._lastResult = null;
     this.x = 0; this.z = 0; this.heading = 0; this.v = 0; this.steer = 0; this.dist = 0;
     this.susP = 0; this.susPv = 0; this.susR = 0; this.susRv = 0; this.susY = 0; this.susYv = 0; this.lastV = 0; this.yawRate = 0;
     this.air = false; this.vy = 0; this.yAir = 0; this.airRx = 0; this.airRxV = 0; this.airRz = 0; this.airT = 0; this.airDist = 0;
@@ -311,6 +314,7 @@ export class Drive {
     this.x = x; this.z = z; this.heading = heading; this.v = v; this.air = false; this.vy = 0;
     this.susP = this.susPv = this.susR = this.susRv = this.susY = this.susYv = 0;
     this._place(0); this._snapCamera();
+    this._accumulator = 0; this._previousPose = null; this._currentPose = null;
   }
 
   buildWorld() {
@@ -552,11 +556,12 @@ export class Drive {
 
   enter() {
     this.buildWorld();
+    if (!this.physics) this.physics = new VehiclePhysics(heightAt, this.wheels);
     this.world.visible = true;
     this.active = true;
     this.fov0 = this.camera.fov;
     this.reset();
-    this.keys.clear(); this.touch = {};
+    this.keys.clear(); this.physicalKeys.clear(); this.touch = {};
     this._place(0);
     this._snapCamera();
   }
@@ -564,7 +569,7 @@ export class Drive {
   exit() {
     this.active = false;
     if (this.world) this.world.visible = false;
-    this.keys.clear(); this.touch = {};
+    this.keys.clear(); this.physicalKeys.clear(); this.touch = {};
     this.boosting = false; this.boostVis = 0; this.flame = 0; this.air = false;
     this.run = { state: 'idle', t: 0 };
     if (this.fx) this._fxHide();
@@ -597,10 +602,10 @@ export class Drive {
     this.keyMap = map;
     window.addEventListener('keydown', e => {
       if (!this.active) return;
-      if (map[e.code]) { this.keys.add(map[e.code]); e.preventDefault(); }
+      if (map[e.code]) { this.physicalKeys.add(e.code); e.preventDefault(); }
     });
-    window.addEventListener('keyup', e => { if (map[e.code]) this.keys.delete(map[e.code]); });
-    window.addEventListener('blur', () => { this.keys.clear(); this.touch = {}; });
+    window.addEventListener('keyup', e => { if (map[e.code]) this.physicalKeys.delete(e.code); });
+    window.addEventListener('blur', () => { this.keys.clear(); this.physicalKeys.clear(); this.touch = {}; });
   }
 
   bindTouch(root) {
@@ -619,16 +624,40 @@ export class Drive {
   // inject inputs programmatically (used by tests / automation)
   setInput(k, on) { if (on) this.keys.add(k); else this.keys.delete(k); }
 
-  input(k) { return this.keys.has(k) || (this.touch[k] || 0) > 0; }
+  input(k) { return this.keys.has(k) || [...this.physicalKeys].some(code => this.keyMap[code] === k) || (this.touch[k] || 0) > 0; }
 
-  // advance by wall-clock dt using fixed-size substeps (stable on slow frames)
+  _capturePose() {
+    return { position: this.van.position.clone(), quaternion: this.van.quaternion.clone(), wheels: this.wheels.map(w => w.node ? w.node.quaternion.clone() : null) };
+  }
+
+  _applyPose(pose) {
+    this.van.position.copy(pose.position); this.van.quaternion.copy(pose.quaternion);
+    this.wheels.forEach((w, i) => { if (w.node && pose.wheels[i]) w.node.quaternion.copy(pose.wheels[i]); });
+  }
+
+  // Simulate at a constant rate and interpolate the visible pose between steps.
   update(dt) {
-    let t = Math.min(dt, 0.5), r = null;
-    do { const h = Math.min(t, 1 / 30); r = this._step(Math.max(h, 1e-4)); t -= h; } while (t > 1e-4);
-    return r;
+    const step = 1 / 60, elapsed = Math.max(0, Math.min(dt, 0.25));
+    if (!this._currentPose) this._previousPose = this._currentPose = this._capturePose();
+    this._applyPose(this._currentPose);
+    this._accumulator += elapsed;
+    while (this._accumulator + 1e-10 >= step) {
+      this._previousPose = this._currentPose;
+      this._lastResult = this._step(step);
+      this._currentPose = this._capturePose();
+      this._accumulator -= step;
+    }
+    const alpha = clamp(this._accumulator / step, 0, 1);
+    this.van.position.lerpVectors(this._previousPose.position, this._currentPose.position, alpha);
+    this.van.quaternion.slerpQuaternions(this._previousPose.quaternion, this._currentPose.quaternion, alpha);
+    this.wheels.forEach((w, i) => { if (w.node && this._previousPose.wheels[i] && this._currentPose.wheels[i]) w.node.quaternion.slerpQuaternions(this._previousPose.wheels[i], this._currentPose.wheels[i], alpha); });
+    this._updateFx(elapsed);
+    this._updateCamera(elapsed);
+    return this._lastResult || { mph: 0, v: 0, braking: false, gear: 'N', boost: this.boost, boosting: false, air: false, timer: -1, runState: 'idle' };
   }
 
   _step(dt) {
+    if (this.physics) return this._physicsStep(dt);
     const gas = this.input('gas') ? 1 : 0, brake = this.input('brake') ? 1 : 0, hand = this.input('hand');
     const steerIn = (this.input('left') ? 1 : 0) - (this.input('right') ? 1 : 0);
     // boost meter: ~4 s of full boost, ~6 s to refill; running dry locks it until the key is released
@@ -691,12 +720,42 @@ export class Drive {
     this._place(delta, dt);
     this._updateRun(dt);
     this.boostVis += ((this.boosting ? 1 : 0) - this.boostVis) * (1 - Math.exp(-dt * (this.boosting ? 4 : 1.7)));
-    this._updateFx(dt);
-    this._updateCamera(dt);
     return { mph: Math.abs(nv) * 2.23694, v: nv, braking: brake && nv > 0.3, gear: nv < -0.1 ? 'R' : (Math.abs(nv) < 0.1 && !gas && !boosting ? 'N' : 'D'), boost: this.boost, boosting: this.boosting, air: this.air, timer: this.run.state === 'idle' ? -1 : this.run.t, runState: this.run.state };
   }
 
+  _physicsStep(dt) {
+    const gas = this.input('gas'), brake = this.input('brake'), boostKey = this.input('boost');
+    if (!boostKey) this.boostLock = false;
+    this.boosting = boostKey && !this.boostLock && this.boost > 0;
+    if (this.boosting) { this.boost = Math.max(0, this.boost - dt / 4); if (this.boost === 0) { this.boostLock = true; this.boosting = false; } }
+    else this.boost = Math.min(1, this.boost + dt / 6);
+    const r = this.physics.step({ gas, brake, boost: this.boosting, hand: this.input('hand'), left: this.input('left'), right: this.input('right') });
+    this.v = r.speed; this.heading = r.heading;
+    this.physics.applyVisual(this.van);
+    this.x = this.van.position.x; this.z = this.van.position.z;
+    this.dist += this.v * dt;
+    for (const w of this.wheels) {
+      if (!w.node) continue;
+      this._q1.setFromAxisAngle(this._xAxis, this.dist / w.r);
+      if (w.front) { this._q2.setFromAxisAngle(this._yAxis, this.physics.steer * 0.58 / (1 + this.v * this.v / 160)); this._q1.premultiply(this._q2); }
+      w.node.quaternion.copy(this._q1).multiply(w.baseQuat);
+    }
+    if (!r.grounded) { this.air = true; this.airT += dt; this.airDist += Math.abs(this.v) * dt; }
+    else if (this.air) {
+      this.air = false;
+      if (this.airT > 0.12) this.airCount++;
+      this.lastAir = { t: this.airT, ft: Math.round(this.airDist * 3.28084) };
+      this.maxAirT = Math.max(this.maxAirT, this.airT);
+      if (this.airT > 0.5 && this.onToast) this.onToast(`AIR ${this.airT.toFixed(1)} s / ${this.lastAir.ft} ft`, 'air');
+      this.airT = 0; this.airDist = 0;
+    }
+    this._updateRun(dt);
+    this.boostVis += ((this.boosting ? 1 : 0) - this.boostVis) * (1 - Math.exp(-dt * (this.boosting ? 4 : 1.7)));
+    return { mph: Math.abs(this.v) * 2.23694, v: this.v, braking: brake && this.v > 0.3, gear: this.v < -0.1 ? 'R' : (Math.abs(this.v) < 0.1 && !gas && !this.boosting ? 'N' : 'D'), boost: this.boost, boosting: this.boosting, air: this.air, timer: this.run.state === 'idle' ? -1 : this.run.t, runState: this.run.state };
+  }
+
   _place(delta, dt = 0) {
+    if (this.physics && dt === 0) { this.physics.reset(this.x, this.z, this.heading, this.v); this.physics.applyVisual(this.van); return; }
     const ch = Math.cos(this.heading), sh = Math.sin(this.heading);
     // group contact heights by actual position (front/rear by z, +X side/-X side by x), not by name
     let hf = 0, hr = 0, hl = 0, hrt = 0, nf = 0, nr = 0, nl = 0, nrt = 0;
@@ -892,3 +951,4 @@ export class Drive {
     this._camInit = true;
   }
 }
+

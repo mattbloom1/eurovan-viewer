@@ -210,6 +210,7 @@ app.copyLink = async () => {
   catch (_) { prompt('Copy this link:', url); }
 };
 app.reset = () => {
+  hourTween = null;
   clearSaved();
   app.state = { ...DEFAULTS, hidden: defaultHidden() };
   applyState(null);
@@ -493,3 +494,4 @@ requestAnimationFrame(tick);
 document.addEventListener('visibilitychange', () => { clock.getDelta(); requestRender(); });
 
 load();
+
