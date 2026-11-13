@@ -77,6 +77,12 @@ async function main() {
   assert.equal(orbit.camMode, 'orbit');
   assert.equal(orbit.camera.position.z, 12, 'orbit should start outside the van after the driver view');
   assert.equal(orbit.controls.target.y, 4.1, 'orbit target should follow the van elevation');
+  let physicsInput;
+  const boostCar = Object.create(drive.namespace.Drive.prototype);
+  Object.assign(boostCar, { input: key => key === 'boost' || key === 'brake', boost: 0.5, boostLock: false, boostVis: 0, air: false, airT: 0, airDist: 0, v: 0, dist: 0, wheels: [], run: { state: 'idle', t: 0 }, van: { position: { x: 0, z: 0 } }, _updateRun() {}, physics: { step(input) { physicsInput = input; return { speed: 0, grounded: true, heading: 0 }; }, applyVisual() {} } });
+  boostCar._physicsStep(1 / 60);
+  assert.equal(physicsInput.boost, false, 'braking should cancel boost thrust');
+  assert.ok(boostCar.boost >= 0.5, 'braking must not waste boost charge');
 
   class Vec {
     constructor(x = 0) { this.x = x; }
