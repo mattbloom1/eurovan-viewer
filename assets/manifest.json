@@ -1,0 +1,1626 @@
+{
+ "version": "v32",
+ "exported": "2026-11-12T23:33:27-07:00",
+ "source": "v32_copy.blend",
+ "total_tris": 413075,
+ "glb_bytes": 1847200,
+ "bounds": {
+  "min": [
+   -1.0865,
+   -1.2832,
+   -2.92
+  ],
+  "max": [
+   1.0865,
+   2.094,
+   2.3863
+  ]
+ },
+ "nodes": [
+  {
+   "name": "Body",
+   "tris": 172743,
+   "bounds": {
+    "min": [
+     -0.9265,
+     0.1437,
+     -2.3946
+    ],
+    "max": [
+     0.9364,
+     1.9384,
+     2.3863
+    ]
+   }
+  },
+  {
+   "name": "Interior",
+   "tris": 34470,
+   "bounds": {
+    "min": [
+     -0.8688,
+     0.4222,
+     -2.321
+    ],
+    "max": [
+     0.8561,
+     1.9034,
+     1.5942
+    ]
+   }
+  },
+  {
+   "name": "PassengerSeat_Stock",
+   "tris": 288,
+   "bounds": {
+    "min": [
+     -0.6397,
+     0.5153,
+     0.45
+    ],
+    "max": [
+     -0.2403,
+     0.781,
+     0.95
+    ]
+   }
+  },
+  {
+   "name": "Buildout",
+   "tris": 139261,
+   "bounds": {
+    "min": [
+     -1.0268,
+     -1.2832,
+     -2.92
+    ],
+    "max": [
+     0.9593,
+     1.873,
+     1.77
+    ]
+   }
+  },
+  {
+   "name": "BO_Bed_Base",
+   "tris": 448,
+   "bounds": {
+    "min": [
+     -0.5415,
+     0.527,
+     -0.916
+    ],
+    "max": [
+     -0.3345,
+     0.7629,
+     -0.3832
+    ]
+   }
+  },
+  {
+   "name": "BO_Closet",
+   "tris": 2522,
+   "bounds": {
+    "min": [
+     0.375,
+     0.523,
+     -1.308
+    ],
+    "max": [
+     0.775,
+     1.815,
+     -0.91
+    ]
+   }
+  },
+  {
+   "name": "BO_Concept_DI",
+   "tris": 87993,
+   "bounds": {
+    "min": [
+     -0.795,
+     0.2895,
+     -2.27
+    ],
+    "max": [
+     0.9593,
+     1.873,
+     1.77
+    ]
+   }
+  },
+  {
+   "name": "BO_Concept_R3L",
+   "tris": 16232,
+   "bounds": {
+    "min": [
+     -0.81,
+     0.36,
+     -2.298
+    ],
+    "max": [
+     0.78,
+     1.7708,
+     0.04
+    ]
+   }
+  },
+  {
+   "name": "BO_Electrics",
+   "tris": 3648,
+   "bounds": {
+    "min": [
+     0.44,
+     0.523,
+     -1.81
+    ],
+    "max": [
+     0.775,
+     1.612,
+     -1.31
+    ]
+   }
+  },
+  {
+   "name": "BO_Fasteners",
+   "tris": 6912,
+   "bounds": {
+    "min": [
+     -0.6876,
+     0.53,
+     -2.2704
+    ],
+    "max": [
+     0.772,
+     1.8094,
+     0.0954
+    ]
+   }
+  },
+  {
+   "name": "BO_Finishes_Safety",
+   "tris": 772,
+   "bounds": {
+    "min": [
+     -0.8189,
+     0.5155,
+     -2.295
+    ],
+    "max": [
+     0.8189,
+     1.555,
+     0.184
+    ]
+   }
+  },
+  {
+   "name": "BO_Hitch_Carrier",
+   "tris": 1064,
+   "bounds": {
+    "min": [
+     -0.92,
+     0.3346,
+     -2.92
+    ],
+    "max": [
+     0.92,
+     0.58,
+     -2.395
+    ]
+   }
+  },
+  {
+   "name": "BO_Kitchen_Desk",
+   "tris": 6364,
+   "bounds": {
+    "min": [
+     0.3851,
+     0.523,
+     -0.9099
+    ],
+    "max": [
+     0.7999,
+     1.5798,
+     0.095
+    ]
+   }
+  },
+  {
+   "name": "BO_Overhead_Lockers_Lighting",
+   "tris": 5038,
+   "bounds": {
+    "min": [
+     -1.0268,
+     -1.2832,
+     -2.044
+    ],
+    "max": [
+     0.6789,
+     1.863,
+     -0.0553
+    ]
+   }
+  },
+  {
+   "name": "BO_Swivel_Seat_Table",
+   "tris": 8268,
+   "bounds": {
+    "min": [
+     -0.7317,
+     0.76,
+     0.1909
+    ],
+    "max": [
+     -0.0548,
+     1.6797,
+     0.9127
+    ]
+   }
+  },
+  {
+   "name": "Door_L_Pivot",
+   "tris": 12314,
+   "bounds": {
+    "min": [
+     0.6832,
+     0.3453,
+     0.2741
+    ],
+    "max": [
+     1.0865,
+     1.7878,
+     1.2954
+    ]
+   }
+  },
+  {
+   "name": "Door_R_Pivot",
+   "tris": 12214,
+   "bounds": {
+    "min": [
+     -1.0865,
+     0.3453,
+     0.2471
+    ],
+    "max": [
+     -0.6832,
+     1.7878,
+     1.2954
+    ]
+   }
+  },
+  {
+   "name": "Slider_Pivot",
+   "tris": 9239,
+   "bounds": {
+    "min": [
+     -0.92,
+     0.3452,
+     -1.0399
+    ],
+    "max": [
+     -0.6626,
+     1.7878,
+     0.1928
+    ]
+   }
+  },
+  {
+   "name": "Tailgate_Pivot",
+   "tris": 20408,
+   "bounds": {
+    "min": [
+     -0.8823,
+     0.5743,
+     -2.3858
+    ],
+    "max": [
+     0.8823,
+     1.8698,
+     -2.0414
+    ]
+   }
+  },
+  {
+   "name": "PopTop_Pivot",
+   "tris": 2558,
+   "bounds": {
+    "min": [
+     -0.674,
+     1.7565,
+     -2.124
+    ],
+    "max": [
+     0.674,
+     2.094,
+     1.0435
+    ]
+   }
+  },
+  {
+   "name": "Wheel_FL",
+   "tris": 2395,
+   "bounds": {
+    "min": [
+     -0.8984,
+     -0.0036,
+     1.1058
+    ],
+    "max": [
+     -0.6722,
+     0.6813,
+     1.785
+    ]
+   }
+  },
+  {
+   "name": "Wheel_FR",
+   "tris": 2395,
+   "bounds": {
+    "min": [
+     0.6723,
+     -0.0033,
+     1.1061
+    ],
+    "max": [
+     0.8985,
+     0.6818,
+     1.7858
+    ]
+   }
+  },
+  {
+   "name": "Wheel_RL",
+   "tris": 2395,
+   "bounds": {
+    "min": [
+     -0.8936,
+     -0.0014,
+     -1.8143
+    ],
+    "max": [
+     -0.668,
+     0.6794,
+     -1.1304
+    ]
+   }
+  },
+  {
+   "name": "Wheel_RR",
+   "tris": 2395,
+   "bounds": {
+    "min": [
+     0.6678,
+     -0.0049,
+     -1.8143
+    ],
+    "max": [
+     0.8942,
+     0.6787,
+     -1.1325
+    ]
+   }
+  }
+ ],
+ "pivots": [
+  {
+   "name": "Door_L_Pivot",
+   "position": [
+    0.8676,
+    0.9,
+    1.285
+   ],
+   "type": "hinge",
+   "axis": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "open": -1.1345,
+   "open_degrees": -65.0
+  },
+  {
+   "name": "Door_R_Pivot",
+   "position": [
+    -0.8676,
+    0.9,
+    1.285
+   ],
+   "type": "hinge",
+   "axis": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "open": 1.1345,
+   "open_degrees": 65.0
+  },
+  {
+   "name": "Slider_Pivot",
+   "position": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "type": "slide",
+   "axis": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "open": 0.95,
+   "out": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "out_dist": 0.12
+  },
+  {
+   "name": "Tailgate_Pivot",
+   "position": [
+    0.0,
+    1.878,
+    -2.05
+   ],
+   "type": "hinge",
+   "axis": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "open": 1.4835,
+   "open_degrees": 85.0
+  },
+  {
+   "name": "PopTop_Pivot",
+   "position": [
+    0.0,
+    1.865,
+    -2.095
+   ],
+   "type": "hinge",
+   "axis": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "open": -0.4887,
+   "open_degrees": -28.0
+  }
+ ],
+ "wheels": [
+  {
+   "name": "Wheel_FL",
+   "position": [
+    -0.7853,
+    0.3382,
+    1.447
+   ],
+   "radius": 0.3424
+  },
+  {
+   "name": "Wheel_FR",
+   "position": [
+    0.7853,
+    0.3382,
+    1.447
+   ],
+   "radius": 0.3426
+  },
+  {
+   "name": "Wheel_RL",
+   "position": [
+    -0.7811,
+    0.3382,
+    -1.473
+   ],
+   "radius": 0.3404
+  },
+  {
+   "name": "Wheel_RR",
+   "position": [
+    0.7811,
+    0.3382,
+    -1.473
+   ],
+   "radius": 0.3418
+  }
+ ],
+ "wheelbase": 2.92,
+ "track": 1.5706,
+ "materials": [
+  {
+   "name": "BO_Aluminium",
+   "color": [
+    0.82,
+    0.82,
+    0.83
+   ],
+   "metallic": 1.0,
+   "roughness": 0.34,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Battery_Case",
+   "color": [
+    0.12,
+    0.12,
+    0.13
+   ],
+   "metallic": 0.0,
+   "roughness": 0.4,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "BO_BirchPly_Edge_X",
+   "color": [
+    0.78,
+    0.6,
+    0.4
+   ],
+   "metallic": 0.0,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_BirchPly_Edge_Y",
+   "color": [
+    0.78,
+    0.6,
+    0.4
+   ],
+   "metallic": 0.0,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_BirchPly_Edge_Z",
+   "color": [
+    0.78,
+    0.6,
+    0.4
+   ],
+   "metallic": 0.0,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_BirchPly_Veneer",
+   "color": [
+    0.76,
+    0.58,
+    0.37
+   ],
+   "metallic": 0.0,
+   "roughness": 0.42,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Black_Matte",
+   "color": [
+    0.014,
+    0.014,
+    0.015
+   ],
+   "metallic": 0.0,
+   "roughness": 0.45,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Black_Steel",
+   "color": [
+    0.03,
+    0.03,
+    0.032
+   ],
+   "metallic": 0.8,
+   "roughness": 0.35,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Brass",
+   "color": [
+    0.8,
+    0.56,
+    0.26
+   ],
+   "metallic": 1.0,
+   "roughness": 0.28,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Cable_AC",
+   "color": [
+    0.85,
+    0.35,
+    0.03
+   ],
+   "metallic": 0.0,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Cable_Black",
+   "color": [
+    0.01,
+    0.01,
+    0.01
+   ],
+   "metallic": 0.0,
+   "roughness": 0.4,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Cable_Red",
+   "color": [
+    0.5,
+    0.01,
+    0.01
+   ],
+   "metallic": 0.0,
+   "roughness": 0.4,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Clear_Smoke",
+   "color": [
+    0.6,
+    0.6,
+    0.62
+   ],
+   "metallic": 0.0,
+   "roughness": 0.05,
+   "alpha": 0.25,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Clip",
+   "color": [
+    0.04,
+    0.04,
+    0.045
+   ],
+   "metallic": 0.0,
+   "roughness": 0.55,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Copper",
+   "color": [
+    0.8,
+    0.38,
+    0.2
+   ],
+   "metallic": 1.0,
+   "roughness": 0.25,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Device_Dark",
+   "color": [
+    0.035,
+    0.037,
+    0.04
+   ],
+   "metallic": 0.0,
+   "roughness": 0.45,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Device_White",
+   "color": [
+    0.82,
+    0.83,
+    0.82
+   ],
+   "metallic": 0.0,
+   "roughness": 0.4,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Display_Blue",
+   "color": [
+    0.2,
+    0.55,
+    1.0
+   ],
+   "metallic": 0.0,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Duct_Foil",
+   "color": [
+    0.7,
+    0.7,
+    0.7
+   ],
+   "metallic": 1.0,
+   "roughness": 0.4,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Duvet_Oat",
+   "color": [
+    0.42,
+    0.36,
+    0.27
+   ],
+   "metallic": 0.0,
+   "roughness": 0.9,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Fan_Smoke",
+   "color": [
+    0.05,
+    0.05,
+    0.055
+   ],
+   "metallic": 0.0,
+   "roughness": 0.2,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "BO_Felt_Wall",
+   "color": [
+    0.5,
+    0.48,
+    0.43
+   ],
+   "metallic": 0.0,
+   "roughness": 1.0,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Fuse_Green",
+   "color": [
+    0.05,
+    0.4,
+    0.08
+   ],
+   "metallic": 0.0,
+   "roughness": 0.3,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Fuse_Yellow",
+   "color": [
+    0.8,
+    0.6,
+    0.02
+   ],
+   "metallic": 0.0,
+   "roughness": 0.3,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Heater_Grey",
+   "color": [
+    0.18,
+    0.18,
+    0.19
+   ],
+   "metallic": 0.0,
+   "roughness": 0.4,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Jerrycan_Fresh",
+   "color": [
+    0.03,
+    0.17,
+    0.42
+   ],
+   "metallic": 0.0,
+   "roughness": 0.35,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Jerrycan_Grey",
+   "color": [
+    0.1,
+    0.1,
+    0.1
+   ],
+   "metallic": 0.0,
+   "roughness": 0.45,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_LED_Emit",
+   "color": [
+    1.0,
+    0.72,
+    0.45
+   ],
+   "metallic": 0.0,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_LED_Warm",
+   "color": [
+    1.0,
+    0.7,
+    0.42
+   ],
+   "metallic": 0.0,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Laptop_Grey",
+   "color": [
+    0.22,
+    0.23,
+    0.25
+   ],
+   "metallic": 0.6,
+   "roughness": 0.35,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Linen_Cream",
+   "color": [
+    0.7,
+    0.64,
+    0.52
+   ],
+   "metallic": 0.0,
+   "roughness": 0.85,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Oak_Solid",
+   "color": [
+    0.5,
+    0.31,
+    0.15
+   ],
+   "metallic": 0.0,
+   "roughness": 0.32,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Pad_Orange",
+   "color": [
+    0.7,
+    0.17,
+    0.015
+   ],
+   "metallic": 0.0,
+   "roughness": 0.85,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Pad_Teal",
+   "color": [
+    0.012,
+    0.16,
+    0.18
+   ],
+   "metallic": 0.0,
+   "roughness": 0.85,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Paint_ForestGreen",
+   "color": [
+    0.055,
+    0.105,
+    0.072
+   ],
+   "metallic": 0.0,
+   "roughness": 0.42,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Perforated_Grille",
+   "color": [
+    0.02,
+    0.02,
+    0.022
+   ],
+   "metallic": 0.6,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Red_Gloss",
+   "color": [
+    0.55,
+    0.012,
+    0.01
+   ],
+   "metallic": 0.0,
+   "roughness": 0.18,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Rubber",
+   "color": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "metallic": 0.0,
+   "roughness": 0.75,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Scan_Headliner",
+   "color": [
+    0.74,
+    0.71,
+    0.65
+   ],
+   "metallic": 0.0,
+   "roughness": 0.85,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Scan_HousingCarpet",
+   "color": [
+    0.26,
+    0.26,
+    0.27
+   ],
+   "metallic": 0.0,
+   "roughness": 0.95,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Scan_StepPlastic",
+   "color": [
+    0.42,
+    0.43,
+    0.44
+   ],
+   "metallic": 0.0,
+   "roughness": 0.7,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Stainless",
+   "color": [
+    0.78,
+    0.78,
+    0.76
+   ],
+   "metallic": 1.0,
+   "roughness": 0.22,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Victron_Blue",
+   "color": [
+    0.012,
+    0.09,
+    0.32
+   ],
+   "metallic": 0.3,
+   "roughness": 0.35,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Vinyl_Plank",
+   "color": [
+    0.6,
+    0.42,
+    0.24
+   ],
+   "metallic": 0.0,
+   "roughness": 0.38,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Webbing",
+   "color": [
+    0.025,
+    0.025,
+    0.028
+   ],
+   "metallic": 0.0,
+   "roughness": 0.7,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_White_Plastic",
+   "color": [
+    0.8,
+    0.8,
+    0.78
+   ],
+   "metallic": 0.0,
+   "roughness": 0.35,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Window_Cover_Quilt",
+   "color": [
+    0.22,
+    0.22,
+    0.23
+   ],
+   "metallic": 0.0,
+   "roughness": 0.7,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Wool_Charcoal",
+   "color": [
+    0.036,
+    0.036,
+    0.04
+   ],
+   "metallic": 0.0,
+   "roughness": 0.85,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Wool_Mustard",
+   "color": [
+    0.55,
+    0.3,
+    0.04
+   ],
+   "metallic": 0.0,
+   "roughness": 0.85,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "BO_Wool_Rust",
+   "color": [
+    0.19,
+    0.035,
+    0.011
+   ],
+   "metallic": 0.0,
+   "roughness": 0.85,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_Alu",
+   "color": [
+    0.55,
+    0.56,
+    0.58
+   ],
+   "metallic": 1.0,
+   "roughness": 0.35,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_AmberLens",
+   "color": [
+    0.95,
+    0.42,
+    0.02
+   ],
+   "metallic": 0.0,
+   "roughness": 0.08,
+   "alpha": 0.75,
+   "has_uv": false
+  },
+  {
+   "name": "VW_AmberLensFluted",
+   "color": [
+    0.6,
+    0.11,
+    0.0
+   ],
+   "metallic": 0.0,
+   "roughness": 0.04,
+   "alpha": 0.97,
+   "has_uv": false
+  },
+  {
+   "name": "VW_AmberReflector",
+   "color": [
+    0.7,
+    0.16,
+    0.0
+   ],
+   "metallic": 0.85,
+   "roughness": 0.18,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_BlackGloss",
+   "color": [
+    0.012,
+    0.012,
+    0.014
+   ],
+   "metallic": 0.0,
+   "roughness": 0.12,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_BlackPlastic",
+   "color": [
+    0.01,
+    0.01,
+    0.011
+   ],
+   "metallic": 0.0,
+   "roughness": 0.62,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_BrakeDisc",
+   "color": [
+    0.28,
+    0.28,
+    0.29
+   ],
+   "metallic": 0.9,
+   "roughness": 0.45,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_BulbGlass",
+   "color": [
+    0.95,
+    0.95,
+    0.9
+   ],
+   "metallic": 0.0,
+   "roughness": 0.05,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_Carpet",
+   "color": [
+    0.05,
+    0.05,
+    0.055
+   ],
+   "metallic": 0.0,
+   "roughness": 0.98,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_Chrome",
+   "color": [
+    0.8,
+    0.8,
+    0.82
+   ],
+   "metallic": 1.0,
+   "roughness": 0.12,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_DashLower",
+   "color": [
+    0.11,
+    0.11,
+    0.115
+   ],
+   "metallic": 0.0,
+   "roughness": 0.6,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_DashPlastic",
+   "color": [
+    0.045,
+    0.045,
+    0.05
+   ],
+   "metallic": 0.0,
+   "roughness": 0.58,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_DecalGrey",
+   "color": [
+    0.16,
+    0.17,
+    0.18
+   ],
+   "metallic": 0.0,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_ExhaustSteel",
+   "color": [
+    0.32,
+    0.29,
+    0.26
+   ],
+   "metallic": 0.9,
+   "roughness": 0.6,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_GaugeBlue",
+   "color": [
+    0.05,
+    0.12,
+    0.9
+   ],
+   "metallic": 0.0,
+   "roughness": 0.4,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_GaugeFace",
+   "color": [
+    0.008,
+    0.008,
+    0.01
+   ],
+   "metallic": 0.0,
+   "roughness": 0.35,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_GaugeRed",
+   "color": [
+    0.9,
+    0.05,
+    0.03
+   ],
+   "metallic": 0.0,
+   "roughness": 0.4,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_Glass",
+   "color": [
+    0.55,
+    0.62,
+    0.6
+   ],
+   "metallic": 0.0,
+   "roughness": 0.02,
+   "alpha": 0.22,
+   "has_uv": false
+  },
+  {
+   "name": "VW_GlassTint",
+   "color": [
+    0.015,
+    0.018,
+    0.02
+   ],
+   "metallic": 0.0,
+   "roughness": 0.03,
+   "alpha": 0.88,
+   "has_uv": false
+  },
+  {
+   "name": "VW_Headliner",
+   "color": [
+    0.42,
+    0.41,
+    0.4
+   ],
+   "metallic": 0.0,
+   "roughness": 0.95,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_HousingDark",
+   "color": [
+    0.05,
+    0.05,
+    0.055
+   ],
+   "metallic": 0.0,
+   "roughness": 0.45,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_JambDark",
+   "color": [
+    0.03,
+    0.03,
+    0.032
+   ],
+   "metallic": 0.0,
+   "roughness": 0.7,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_LensClearExt",
+   "color": [
+    0.92,
+    0.94,
+    0.95
+   ],
+   "metallic": 0.0,
+   "roughness": 0.02,
+   "alpha": 0.18,
+   "has_uv": false
+  },
+  {
+   "name": "VW_Mirror",
+   "color": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "metallic": 1.0,
+   "roughness": 0.02,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_Paint",
+   "color": [
+    0.56,
+    0.57,
+    0.585
+   ],
+   "metallic": 0.75,
+   "roughness": 0.3,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_PlateWhite",
+   "color": [
+    0.85,
+    0.85,
+    0.82
+   ],
+   "metallic": 0.0,
+   "roughness": 0.4,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_PopTopGel",
+   "color": [
+    0.8,
+    0.81,
+    0.8
+   ],
+   "metallic": 0.0,
+   "roughness": 0.42,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_Reflector",
+   "color": [
+    0.85,
+    0.86,
+    0.88
+   ],
+   "metallic": 1.0,
+   "roughness": 0.08,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_RimAlloy",
+   "color": [
+    0.62,
+    0.63,
+    0.65
+   ],
+   "metallic": 0.85,
+   "roughness": 0.46,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_Rubber",
+   "color": [
+    0.025,
+    0.025,
+    0.027
+   ],
+   "metallic": 0.0,
+   "roughness": 0.8,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_SoftBlack",
+   "color": [
+    0.018,
+    0.018,
+    0.02
+   ],
+   "metallic": 0.0,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_Speaker",
+   "color": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "metallic": 0.0,
+   "roughness": 0.7,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_SteelBlack",
+   "color": [
+    0.02,
+    0.02,
+    0.022
+   ],
+   "metallic": 0.6,
+   "roughness": 0.5,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_SteelZinc",
+   "color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "metallic": 1.0,
+   "roughness": 0.45,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_TailLens",
+   "color": [
+    0.62,
+    0.015,
+    0.02
+   ],
+   "metallic": 0.0,
+   "roughness": 0.08,
+   "alpha": 0.82,
+   "has_uv": false
+  },
+  {
+   "name": "VW_TrimGrey",
+   "color": [
+    0.16,
+    0.16,
+    0.17
+   ],
+   "metallic": 0.0,
+   "roughness": 0.62,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_TrimLight",
+   "color": [
+    0.3,
+    0.3,
+    0.31
+   ],
+   "metallic": 0.0,
+   "roughness": 0.6,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_Underbody",
+   "color": [
+    0.04,
+    0.04,
+    0.04
+   ],
+   "metallic": 0.0,
+   "roughness": 0.9,
+   "alpha": 1.0,
+   "has_uv": false
+  },
+  {
+   "name": "VW_Velour",
+   "color": [
+    0.24,
+    0.24,
+    0.25
+   ],
+   "metallic": 0.0,
+   "roughness": 0.95,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_Webbing",
+   "color": [
+    0.028,
+    0.029,
+    0.032
+   ],
+   "metallic": 0.0,
+   "roughness": 0.72,
+   "alpha": 1.0,
+   "has_uv": true
+  },
+  {
+   "name": "VW_WindowRubber",
+   "color": [
+    0.004,
+    0.004,
+    0.005
+   ],
+   "metallic": 0.0,
+   "roughness": 0.38,
+   "alpha": 1.0,
+   "has_uv": false
+  }
+ ]
+}

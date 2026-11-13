@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f3a2e">
+<meta name="description" content="Interactive 3D viewer and configurator for a 2003 VW EuroVan (T4) pop-top camper buildout.">
+<title>EuroVan Camper Configurator</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='18' width='52' height='30' rx='8' fill='%232f5d46'/%3E%3Crect x='12' y='24' width='14' height='10' rx='2' fill='%23f4efe4'/%3E%3Crect x='30' y='24' width='22' height='10' rx='2' fill='%23f4efe4'/%3E%3Ccircle cx='18' cy='48' r='6' fill='%23222'/%3E%3Ccircle cx='46' cy='48' r='6' fill='%23222'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <canvas id="c" aria-label="3D view of the EuroVan"></canvas>
+
+  <header id="brand">
+    <div class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 64 40"><rect x="2" y="4" width="60" height="28" rx="8"/><rect class="w" x="8" y="9" width="15" height="10" rx="2"/><rect class="w" x="27" y="9" width="29" height="10" rx="2"/><circle cx="16" cy="33" r="6"/><circle cx="48" cy="33" r="6"/></svg>
+    </div>
+    <div>
+      <h1>EuroVan Camper</h1>
+      <p>2003 T4 pop-top &middot; buildout configurator</p>
+    </div>
+  </header>
+
+  <nav id="views" aria-label="Camera views">
+    <button data-view="exterior" class="chip">Exterior</button>
+    <button data-view="interior" class="chip">Interior</button>
+    <button data-view="rear" class="chip">Rear</button>
+    <button data-view="plan" class="chip">Plan</button>
+    <button data-view="driver" class="chip">Driver</button>
+  </nav>
+
+  <div id="quick">
+    <button id="btn-daynight" class="round" title="Day / night" aria-label="Toggle day and night">
+      <svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+    </button>
+    <button id="btn-shot" class="round" title="Screenshot" aria-label="Download screenshot">
+      <svg viewBox="0 0 24 24"><path d="M4 7h3l2-2.5h6L17 7h3a1.5 1.5 0 0 1 1.5 1.5v10A1.5 1.5 0 0 1 20 20H4a1.5 1.5 0 0 1-1.5-1.5v-10A1.5 1.5 0 0 1 4 7z"/><circle cx="12" cy="13" r="3.8"/></svg>
+    </button>
+    <button id="btn-panel" class="round" title="Show / hide panel" aria-label="Toggle panel">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+
+  <aside id="panel" aria-label="Configurator">
+    <div class="grab" aria-hidden="true"></div>
+    <div id="tabs" role="tablist">
+      <button role="tab" data-tab="finishes" aria-selected="true">Finishes</button>
+      <button role="tab" data-tab="parts">Parts</button>
+      <button role="tab" data-tab="open">Open</button>
+      <button role="tab" data-tab="scene">Scene</button>
+      <button role="tab" data-tab="drive">Drive</button>
+    </div>
+    <div id="panes">
+      <section class="pane" data-pane="finishes"></section>
+      <section class="pane" data-pane="parts" hidden></section>
+      <section class="pane" data-pane="open" hidden></section>
+      <section class="pane" data-pane="scene" hidden></section>
+      <section class="pane" data-pane="drive" hidden></section>
+    </div>
+  </aside>
+
+  <div id="drive-hud" hidden>
+    <div class="speedo"><span id="mph">0</span><small>mph</small><em id="gear">D</em></div>
+    <div class="drive-top">
+      <button id="btn-cam" class="pill">Camera: chase</button>
+      <button id="btn-reset-car" class="pill">Reset</button>
+      <button id="btn-exit-drive" class="pill accent">Exit drive</button>
+    </div>
+    <p class="drive-help">W/&uarr; gas &middot; S/&darr; brake/reverse &middot; A/D steer &middot; Space handbrake &middot; C camera &middot; R reset &middot; Esc exit</p>
+    <div id="touch-drive">
+      <div class="steer">
+        <button data-k="left" aria-label="Steer left"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></button>
+        <button data-k="right" aria-label="Steer right"><svg viewBox="0 0 24 24"><path d="M9 4l8 8-8 8"/></svg></button>
+      </div>
+      <div class="pedals">
+        <button data-k="brake" class="brake" aria-label="Brake / reverse">BRAKE</button>
+        <button data-k="gas" class="gas" aria-label="Gas">GAS</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loader">
+    <div class="loader-card">
+      <div class="brand-mark big" aria-hidden="true"><svg viewBox="0 0 64 40"><rect x="2" y="4" width="60" height="28" rx="8"/><rect class="w" x="8" y="9" width="15" height="10" rx="2"/><rect class="w" x="27" y="9" width="29" height="10" rx="2"/><circle cx="16" cy="33" r="6"/><circle cx="48" cy="33" r="6"/></svg></div>
+      <p id="loader-text">Loading the van&hellip;</p>
+      <div class="bar"><i id="loader-bar"></i></div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <footer id="foot"><span id="model-info">model: &ndash;</span></footer>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
