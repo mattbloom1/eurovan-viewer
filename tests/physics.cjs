@@ -98,7 +98,12 @@ const vm = require('node:vm');
   flat.reset(0, 0, 0, 52);
   let furthest = flat.body.position.z;
   for (let i = 0; i < 75; i++) { flat.step({}); furthest = Math.max(furthest, flat.body.position.z); }
-  assert.ok(furthest < 16, 'the van must not tunnel through a tree at boost speed');
+  console.log('Furthest van centre during high-speed tree impact:', furthest.toFixed(2), 'm');
+  assert.ok(furthest < 14.1, 'the front of the van should stop near the tree at boost speed');
+  flat.reset(-12, 16, Math.PI / 2, 20);
+  let furthestX = flat.body.position.x;
+  for (let i = 0; i < 90; i++) { flat.step({}); furthestX = Math.max(furthestX, flat.body.position.x); }
+  assert.ok(furthestX < -1.8, 'tree collision should also work when driving across the course');
   flat.reset(12, 0, 0, 12);
   for (let i = 0; i < 60; i++) flat.step({ hand: true });
   const handbrakeSpeed = Math.abs(flat.speed);
