@@ -47,6 +47,10 @@ async function main() {
     assert.equal(car.input(action), true, `${action} must remain active while another key is held`);
     handlers.keyup(event(b)); assert.equal(car.input(action), false);
   }
+  let prevented = false;
+  handlers.keydown({ code: 'Space', target: { closest: () => ({}) }, preventDefault() { prevented = true; } });
+  assert.equal(prevented, false, 'Space should activate a focused UI control');
+  assert.equal(car.input('hand'), false, 'activating a control should not apply the handbrake');
   car.setInput('gas', true); handlers.blur(); assert.equal(car.input('gas'), false);
   const touchHandlers = {}, classes = new Set();
   const button = { dataset: { k: 'gas' }, classList: { toggle: (name, on) => on ? classes.add(name) : classes.delete(name), remove: name => classes.delete(name) }, addEventListener: (name, fn) => { touchHandlers[name] = fn; }, setPointerCapture() {} };

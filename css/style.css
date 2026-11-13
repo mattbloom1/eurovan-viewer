@@ -148,13 +148,14 @@ body.night #foot { color: rgba(230,235,245,.6); text-shadow: none; }
 #drive-hud[hidden] { display: none; }
 #drive-hud { position: absolute; inset: 0; pointer-events: none; }
 #drive-hud button { pointer-events: auto; }
+#drive-hud :is(button, summary):focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .speedo { position: absolute; left: 50%; bottom: calc(26px + var(--safe-b)); transform: translateX(-50%); background: rgba(20,28,24,.78); color: #f6f3ea; border-radius: 18px; padding: 8px 18px 10px; display: flex; align-items: baseline; gap: 6px; min-width: 150px; justify-content: center; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .speedo span { font-size: 40px; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1; }
 .speedo small { font-size: 13px; opacity: .7; }
 .speedo em { font-style: normal; font-weight: 700; font-size: 14px; margin-left: 8px; padding: 2px 7px; border-radius: 6px; background: rgba(255,255,255,.14); }
 .speedo { flex-wrap: wrap; }
 .boostbar { flex: 1 0 100%; display: flex; align-items: center; gap: 8px; margin-top: 7px; }
-.boostbar b { font-size: 10.5px; letter-spacing: .12em; opacity: .75; font-weight: 750; }
+.boostbar b { font-size: 11px; letter-spacing: .12em; opacity: .85; font-weight: 750; }
 .boostbar .track { flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,.16); overflow: hidden; }
 .boostbar i { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(1); background: linear-gradient(90deg, #ff7a1f, #ffd04a); border-radius: 4px; }
 .boostbar.on i { background: linear-gradient(90deg, #ffb347, #fff3c0); box-shadow: 0 0 8px #ffa640; }
@@ -167,7 +168,9 @@ body.night #foot { color: rgba(230,235,245,.6); text-shadow: none; }
 .drive-top { position: absolute; top: calc(14px + var(--safe-t)); right: calc(16px + var(--safe-r)); display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .pill { border: 0; background: var(--paper); box-shadow: var(--shadow); border-radius: 999px; padding: 11px 16px; font-size: 14px; font-weight: 650; cursor: pointer; min-height: 44px; }
 .pill.accent { background: var(--accent); color: var(--accent-ink); }
-.drive-help { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(118px + var(--safe-b)); margin: 0; width: max-content; max-width: calc(100vw - 24px); text-align: center; font-size: 12.5px; color: rgba(255,255,255,.92); text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.drive-help { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(118px + var(--safe-b)); width: max-content; max-width: calc(100vw - 24px); text-align: center; font-size: 12.5px; color: #fff; background: rgba(20,28,24,.88); border-radius: 12px; pointer-events: auto; }
+.drive-help summary { cursor: pointer; padding: 7px 12px; font-weight: 650; }
+.drive-help p { margin: 0; padding: 0 12px 10px; line-height: 1.5; }
 #touch-drive { display: none; }
 body.touch #touch-drive { display: block; }
 body.touch .drive-help { display: none; }
@@ -178,9 +181,9 @@ body.touch .drive-help { display: none; }
 #touch-drive .steer svg { width: 34px; height: 34px; fill: none; stroke: var(--ink); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 #touch-drive .pedals button { width: 74px; border-radius: 16px; font-weight: 800; font-size: 13px; letter-spacing: .06em; color: #fff; box-shadow: var(--shadow); }
 #touch-drive .gas { height: 112px; background: rgba(47,93,70,.9); }
-#touch-drive .brake { height: 80px; background: rgba(181,86,47,.9); }
+#touch-drive .brake { height: 80px; background: rgba(145,56,26,.96); }
 #touch-drive button.held { transform: scale(0.94); filter: brightness(1.15); }
-#touch-drive .boost { position: absolute; right: calc(14px + var(--safe-r)); bottom: calc(142px + var(--safe-b)); width: 160px; height: 54px; border-radius: 16px; font-weight: 850; font-size: 15px; letter-spacing: .1em; color: #fff; background: linear-gradient(180deg, rgba(255,140,40,.95), rgba(214,84,30,.95)); box-shadow: var(--shadow); }
+#touch-drive .boost { position: absolute; right: calc(14px + var(--safe-r)); bottom: calc(142px + var(--safe-b)); width: 160px; height: 54px; border-radius: 16px; font-weight: 850; font-size: 15px; letter-spacing: .1em; color: #fff; background: linear-gradient(180deg, #a43d0e, #842d0d); box-shadow: var(--shadow); }
 body.touch .speedo { bottom: auto; top: calc(70px + var(--safe-t)); }
 body.touch #drive-toast { font-size: 26px; top: 30%; }
 body.touch #drive-toast.summit { font-size: 32px; }

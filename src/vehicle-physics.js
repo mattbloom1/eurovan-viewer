@@ -40,7 +40,7 @@ export class VehiclePhysics {
       this.world.addBody(body);
       body.updateAABB();
     }
-    this.body = new CANNON.Body({ mass: 1600, shape: new CANNON.Box(new CANNON.Vec3(0.75, 0.36, 1.9)), linearDamping: 0.015, angularDamping: 0.45 });
+    this.body = new CANNON.Body({ mass: 1600, shape: new CANNON.Box(new CANNON.Vec3(0.88, 0.36, 2.25)), linearDamping: 0.015, angularDamping: 0.45 });
     this.vehicle = new CANNON.RaycastVehicle({ chassisBody: this.body, indexRightAxis: 0, indexUpAxis: 1, indexForwardAxis: 2 });
     // Cannon's vehicle uses world.rayTest for its suspension. Wheels should
     // sample the ground, while the chassis handles impacts with obstacles.
@@ -83,15 +83,16 @@ export class VehiclePhysics {
     for (let i = 0; i < this.wheels.length; i++) {
       vehicle.setSteeringValue(this.wheels[i].front ? steering : 0, i);
       vehicle.applyEngineForce(force, i);
-      vehicle.setBrake(input.hand && !this.wheels[i].front ? Math.max(brake, 25) : brake, i);
+      // Cannon treats brake as an impulse per step; split it across substeps.
+      vehicle.setBrake((input.hand && !this.wheels[i].front ? Math.max(brake, 25) : brake) / 2, i);
     }
     // Rolling and aerodynamic resistance make coasting predictable without
     // imposing an abrupt speed cutoff; fade resistance near zero to avoid jitter.
     const resistance = 1600 * (0.22 + 0.0042 * speed * speed) * clamp(speed / 0.5, -1, 1);
     this.forward.scale(-resistance, this.drag);
-    b.applyForce(this.drag);
     const impactSpeed = Math.max(0, -b.velocity.y);
-    this.world.step(STEP);
+    // Smaller collision steps reduce visible penetration at boost speeds.
+    for (let i = 0; i < 2; i++) { b.applyForce(this.drag); this.world.step(STEP / 2); }
     // Stop outward motion at the world edge instead of reporting speed while
     // the position is pinned; preserve any velocity along the boundary.
     if (b.position.x < LIMITS.minX) { b.position.x = LIMITS.minX; if (b.velocity.x < 0) b.velocity.x = 0; }
