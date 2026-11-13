@@ -7,9 +7,10 @@ const LIMITS = { minX: -280, maxX: 400, minZ: -280, maxZ: 280 };
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
 export class VehiclePhysics {
-  constructor(heightAt, wheels) {
+  constructor(heightAt, wheels, obstacles = []) {
     this.heightAt = heightAt;
     this.world = new CANNON.World({ gravity: new CANNON.Vec3(0, -12, 0) });
+    this.world.broadphase = new CANNON.SAPBroadphase(this.world);
     const heights = [];
     // One collision field is prepared on entry; no terrain is rebuilt during a drive.
     for (let x = -300; x <= 420; x++) {
@@ -21,6 +22,12 @@ export class VehiclePhysics {
     ground.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
     this.world.addBody(ground);
     ground.updateAABB(); // Wheel raycasts run before the first world step.
+    for (const obstacle of obstacles) {
+      const radius = Math.max(0.1, obstacle.radius), height = Math.max(0.5, obstacle.height);
+      const body = new CANNON.Body({ mass: 0, shape: new CANNON.Box(new CANNON.Vec3(radius, height / 2, radius)), position: new CANNON.Vec3(obstacle.x, obstacle.y + height / 2, obstacle.z) });
+      this.world.addBody(body);
+      body.updateAABB();
+    }
     this.body = new CANNON.Body({ mass: 1600, shape: new CANNON.Box(new CANNON.Vec3(0.75, 0.36, 1.9)), linearDamping: 0.015, angularDamping: 0.45 });
     this.vehicle = new CANNON.RaycastVehicle({ chassisBody: this.body, indexRightAxis: 0, indexUpAxis: 1, indexForwardAxis: 2 });
     for (const w of wheels) this.vehicle.addWheel({
@@ -32,6 +39,7 @@ export class VehiclePhysics {
     this.vehicle.addToWorld(this.world);
     this.forward = new CANNON.Vec3();
     this.offset = new CANNON.Vec3();
+    this.drag = new CANNON.Vec3();
     this.reset();
   }
 
@@ -54,15 +62,19 @@ export class VehiclePhysics {
     this.steer += clamp(steerInput - this.steer, -rate * STEP, rate * STEP);
     const steering = this.steer * (0.58 / (1 + speed * speed / 160));
     let force = 0, brake = 0;
-    if (input.boost) force = speed < 52 ? -6000 : 0;
-    else if (input.gas) force = speed < 42 ? -1400 : 0;
-    if (input.brake) { if (speed > 0.5) brake = 120; else force = 1000; }
-    if (input.hand) brake = 200;
+    if (input.boost) force = -6000 * clamp(1 - Math.max(0, speed) / 52, 0, 1);
+    else if (input.gas) force = -1400 * clamp(1 - Math.max(0, speed) / 42, 0, 1);
+    if (input.brake) { if (speed > 0.5) brake = 120; else force = 1000 * clamp(1 + Math.min(0, speed) / 6, 0, 1); }
     for (let i = 0; i < this.wheels.length; i++) {
       vehicle.setSteeringValue(this.wheels[i].front ? steering : 0, i);
       vehicle.applyEngineForce(force, i);
-      vehicle.setBrake(brake, i);
+      vehicle.setBrake(input.hand && !this.wheels[i].front ? Math.max(brake, 25) : brake, i);
     }
+    // Rolling and aerodynamic resistance make coasting predictable without
+    // imposing an abrupt speed cutoff; fade resistance near zero to avoid jitter.
+    const resistance = 1600 * (0.22 + 0.0042 * speed * speed) * clamp(speed / 0.5, -1, 1);
+    this.forward.scale(-resistance, this.drag);
+    b.applyForce(this.drag);
     this.world.step(STEP);
     b.position.x = clamp(b.position.x, LIMITS.minX, LIMITS.maxX);
     b.position.z = clamp(b.position.z, LIMITS.minZ, LIMITS.maxZ);
