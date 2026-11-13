@@ -262,6 +262,7 @@ export class Drive {
     this.active = false;
     this.camMode = 'chase';
     this.keys = new Set();
+    this.physicalKeys = new Set();
     this.touch = {};
     this.onToast = null;                 // (text|null, kind) => void, set by main.js
     // wheel geometry from manifest, falling back to the nodes / sensible defaults
@@ -556,7 +557,7 @@ export class Drive {
     this.active = true;
     this.fov0 = this.camera.fov;
     this.reset();
-    this.keys.clear(); this.touch = {};
+    this.keys.clear(); this.physicalKeys.clear(); this.touch = {};
     this._place(0);
     this._snapCamera();
   }
@@ -564,7 +565,7 @@ export class Drive {
   exit() {
     this.active = false;
     if (this.world) this.world.visible = false;
-    this.keys.clear(); this.touch = {};
+    this.keys.clear(); this.physicalKeys.clear(); this.touch = {};
     this.boosting = false; this.boostVis = 0; this.flame = 0; this.air = false;
     this.run = { state: 'idle', t: 0 };
     if (this.fx) this._fxHide();
@@ -597,10 +598,10 @@ export class Drive {
     this.keyMap = map;
     window.addEventListener('keydown', e => {
       if (!this.active) return;
-      if (map[e.code]) { this.keys.add(map[e.code]); e.preventDefault(); }
+      if (map[e.code]) { this.physicalKeys.add(e.code); e.preventDefault(); }
     });
-    window.addEventListener('keyup', e => { if (map[e.code]) this.keys.delete(map[e.code]); });
-    window.addEventListener('blur', () => { this.keys.clear(); this.touch = {}; });
+    window.addEventListener('keyup', e => { if (map[e.code]) this.physicalKeys.delete(e.code); });
+    window.addEventListener('blur', () => { this.keys.clear(); this.physicalKeys.clear(); this.touch = {}; });
   }
 
   bindTouch(root) {
@@ -619,7 +620,7 @@ export class Drive {
   // inject inputs programmatically (used by tests / automation)
   setInput(k, on) { if (on) this.keys.add(k); else this.keys.delete(k); }
 
-  input(k) { return this.keys.has(k) || (this.touch[k] || 0) > 0; }
+  input(k) { return this.keys.has(k) || [...this.physicalKeys].some(code => this.keyMap[code] === k) || (this.touch[k] || 0) > 0; }
 
   // advance by wall-clock dt using fixed-size substeps (stable on slow frames)
   update(dt) {
@@ -892,3 +893,4 @@ export class Drive {
     this._camInit = true;
   }
 }
+
