@@ -589,9 +589,12 @@ export class Drive {
     g.add(fx.light);
   }
 
-  enter() {
+  async enter() {
     this.buildWorld();
-    if (!this.physics) this.physics = new VehiclePhysics(heightAt, this.wheels, this.obstacleColliders);
+    if (!this.physics) {
+      const heights = await VehiclePhysics.prepareTerrain(heightAt);
+      this.physics = new VehiclePhysics(heightAt, this.wheels, this.obstacleColliders, heights);
+    }
     this.world.visible = true;
     this.active = true;
     this.fov0 = this.camera.fov;
