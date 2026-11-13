@@ -7,7 +7,7 @@ import { DEFAULTS, BUILDOUT_DEFAULT_OFF, PIVOT_DEFAULTS } from './config.js';
 import { Finishes } from './finishes.js';
 import { Openings, findNode } from './openings.js';
 import { Environment, VanLights } from './environment.js';
-import { Drive } from './drive.js';
+import { Drive, heightAt } from './drive.js';
 import { UI } from './ui.js';
 import { loadState, saveState, shareUrl, clearSaved } from './state.js';
 import { setMaxAnisotropy } from './textures.js';
@@ -307,8 +307,8 @@ app.enterDrive = () => {
   app.openings.closeAll(true);
   app.setSection(false);
   tween = null;
-  env.setDriveFog(true);
   app.drive.enter();
+  env.setDriveFog(true);
   document.body.classList.add('driving');
   hud.hidden = false;
   updateViewOffset();
@@ -327,6 +327,7 @@ app.exitDrive = () => {
   env.setFocus(new THREE.Vector3(0, 0, 0));
   env.blob.position.set(0, 0.004, 0);
   env.blob.rotation.set(0, 0, 0);
+  env.blob.material.opacity = 0.85 * (1 - env.nightFactor * 0.5);
   document.body.classList.remove('driving');
   hud.hidden = true;
   updateViewOffset();
@@ -479,8 +480,7 @@ function tick() {
     const b = r.braking ? 1 : 0;
     if (b !== lastBrake) { lastBrake = b; updateLights(b); }
     env.setFocus(app.van.position);
-    env.blob.position.set(app.van.position.x, app.van.position.y + 0.02, app.van.position.z);
-    env.blob.rotation.y = app.drive.heading;
+    env.setDriveShadow(app.van.position, app.drive.heading, heightAt(app.van.position.x, app.van.position.z));
     active = true;
   }
   if (controls.enabled && controls.update(dt)) active = true;

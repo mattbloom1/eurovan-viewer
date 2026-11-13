@@ -167,7 +167,7 @@ body.night #foot { color: rgba(230,235,245,.6); text-shadow: none; }
 .drive-top { position: absolute; top: calc(14px + var(--safe-t)); right: calc(16px + var(--safe-r)); display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .pill { border: 0; background: var(--paper); box-shadow: var(--shadow); border-radius: 999px; padding: 11px 16px; font-size: 14px; font-weight: 650; cursor: pointer; min-height: 44px; }
 .pill.accent { background: var(--accent); color: var(--accent-ink); }
-.drive-help { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(92px + var(--safe-b)); margin: 0; font-size: 12.5px; color: rgba(255,255,255,.92); text-shadow: 0 1px 3px rgba(0,0,0,.6); white-space: nowrap; }
+.drive-help { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(118px + var(--safe-b)); margin: 0; width: max-content; max-width: calc(100vw - 24px); text-align: center; font-size: 12.5px; color: rgba(255,255,255,.92); text-shadow: 0 1px 3px rgba(0,0,0,.6); }
 #touch-drive { display: none; }
 body.touch #touch-drive { display: block; }
 body.touch .drive-help { display: none; }
@@ -217,3 +217,4 @@ body.driving #brand, body.driving #views, body.driving #quick, body.driving #pan
   .chip { padding: 8px 7px; font-size: 12.5px; }
   .cards { grid-template-columns: repeat(3, 1fr); }
 }
+

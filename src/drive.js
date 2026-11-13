@@ -94,7 +94,7 @@ const RAMPS = [
   makeRamp(CA.x + UX * 56 - NX * 9, CA.z + UZ * 56 - NZ * 9, TRACK_H, 5.5, kicker(2.4, 10), 'double-b'),
 ];
 function rampAt(x, z) {
-  let best = 0;
+  let best = -Infinity;
   for (let k = 0; k < RAMPS.length; k++) {
     const rp = RAMPS[k], dx = x - rp.x, dz = z - rp.z;
     if (dx * dx + dz * dz > rp.rad2) continue;
@@ -102,7 +102,7 @@ function rampAt(x, z) {
     if (w > rp.W / 2 || u <= P[0][0] || u >= P[P.length - 1][0]) continue;
     let i = 0; while (u > P[i + 1][0]) i++;
     const t = (u - P[i][0]) / (P[i + 1][0] - P[i][0]);
-    const hh = (P[i][1] + (P[i + 1][1] - P[i][1]) * t) * smooth(rp.W / 2, rp.W / 2 - 0.35, w);
+    const hh = P[i][1] + (P[i + 1][1] - P[i][1]) * t;
     if (hh > best) best = hh;
   }
   return best;
@@ -148,9 +148,28 @@ export function groundAt(x, z) {
   }
   return h;
 }
-// Everything the van drives on: terrain + ramps.
+// Match the visible terrain triangles so the physics and shadow follow the mesh,
+// including the lower-resolution terrain away from the mountain.
+const surfaceSamples = new Map();
+function surfaceSample(x, z) {
+  const key = `${x},${z}`;
+  let value = surfaceSamples.get(key);
+  if (value === undefined) { value = groundAt(x, z); surfaceSamples.set(key, value); }
+  return value;
+}
+export function surfaceGroundAt(x, z) {
+  const patch = x >= 85 && x < 375 && z >= -185 && z < 105;
+  const size = patch ? 2 : 5, ox = patch ? 85 : WORLD_X0, oz = patch ? -185 : -WORLD_Z;
+  const i = Math.floor((x - ox) / size), j = Math.floor((z - oz) / size);
+  const x0 = ox + i * size, z0 = oz + j * size, u = (x - x0) / size, v = (z - z0) / size;
+  const a = surfaceSample(x0, z0), b = surfaceSample(x0 + size, z0), c = surfaceSample(x0, z0 + size), d = surfaceSample(x0 + size, z0 + size);
+  if ((i + j) & 1) return v >= u ? a * (1 - v) + c * (v - u) + d * u : a * (1 - u) + d * v + b * (u - v);
+  return u + v <= 1 ? a * (1 - u - v) + c * v + b * u : b * (1 - v) + c * (1 - u) + d * (u + v - 1);
+}
+
+// Everything the van drives on: the rendered terrain and ramps.
 export function heightAt(x, z) {
-  const g = groundAt(x, z);
+  const g = surfaceGroundAt(x, z);
   const rp = rampAt(x, z);
   return rp > g ? rp : g;
 }
@@ -265,6 +284,7 @@ export class Drive {
     this.keys = new Set();
     this.physicalKeys = new Set();
     this.touch = {};
+    this._touchButtons = [];
     this.onToast = null;                 // (text|null, kind) => void, set by main.js
     // wheel geometry from manifest, falling back to the nodes / sensible defaults
     const mw = Array.isArray(manifest && manifest.wheels) ? manifest.wheels : [];
@@ -320,6 +340,7 @@ export class Drive {
   buildWorld() {
     if (this.world) return;
     const g = new THREE.Group(); g.name = 'DriveWorld';
+    this.obstacleColliders = [];
     // ---- terrain: coarse base mesh with a hole + finer patch over the mountain, normals/colours from the height function
     const grassA = new THREE.Color(0x56703a), grassB = new THREE.Color(0x7c8a48), dirt = new THREE.Color(0x8a7656), rock = new THREE.Color(0x7d7b74);
     const alpine = new THREE.Color(0x8c8a5a), snow = new THREE.Color(0xdde3e8), roadC = new THREE.Color(0x9c8159), rockD = new THREE.Color(0x65625c), c = new THREE.Color();
@@ -422,7 +443,7 @@ export class Drive {
         let ox = nx / nl, oz = nz / nl;
         if (ox * (ROAD.xs[i] - MC.x) + oz * (ROAD.zs[i] - MC.z) < 0) { ox = -ox; oz = -oz; }
         const px = ROAD.xs[i] + ox * (ROAD_HALF + 0.5), pz = ROAD.zs[i] + oz * (ROAD_HALF + 0.5);
-        d.position.set(px, groundAt(px, pz), pz); d.updateMatrix(); posts.setMatrixAt(n++, d.matrix);
+        d.position.set(px, surfaceGroundAt(px, pz), pz); d.updateMatrix(); posts.setMatrixAt(n++, d.matrix);
       }
       posts.count = n; posts.castShadow = true; g.add(posts);
     }
@@ -474,6 +495,7 @@ export class Drive {
       const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 7, 8).translate(0, 3.5, 0), poleMat);
       const head = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 0.35), poleMat); head.position.set(0, 7, 0);
       pole.position.set(x, 0, z); pole.add(head); pole.castShadow = true; g.add(pole);
+      this.obstacleColliders.push({ x, z, y: 0, radius: 0.12, height: 7 });
     }
     // trees (trunk + two foliage cones): scattered over the world and on the lower mountain slopes (road kept clear), rocks
     const nearRamp = (x, z, pad) => RAMPS.some(rp => Math.hypot(x - rp.x, z - rp.z) < rp.pts[rp.pts.length - 1][0] + rp.W + pad);
@@ -485,8 +507,9 @@ export class Drive {
     let n = 0;
     const plant = (x, z) => {
       const s = 0.7 + r() * 0.8;
-      dummy.position.set(x, groundAt(x, z) - 0.1, z); dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s, s * (0.8 + r() * 0.5), s); dummy.updateMatrix();
+      dummy.position.set(x, surfaceGroundAt(x, z) - 0.1, z); dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s, s * (0.8 + r() * 0.5), s); dummy.updateMatrix();
       trunk.setMatrixAt(n, dummy.matrix); fol.setMatrixAt(n, dummy.matrix); fol2.setMatrixAt(n, dummy.matrix);
+      this.obstacleColliders.push({ x, z, y: dummy.position.y, radius: 0.24 * s, height: 2.2 * dummy.scale.y });
       tc.setHSL(0.3 + r() * 0.06, 0.35, 0.22 + r() * 0.1); fol.setColorAt(n, tc); fol2.setColorAt(n, tc.offsetHSL(0, 0, 0.05));
       n++;
     };
@@ -510,7 +533,8 @@ export class Drive {
       let x, z;
       do { x = (r() * 2 - 1) * 200; z = (r() * 2 - 1) * 200; } while ((Math.abs(x) < LOT_X + 4 && Math.abs(z) < LOT_Z + 4) || Math.hypot(x - MC.x, z - MC.z) < MR + 10 || (x > 0 && distSeg(x, z, CA, CB) < 20));
       const s = 0.4 + r() * 1.4;
-      dummy.position.set(x, groundAt(x, z) - 0.2 * s, z); dummy.rotation.set(r() * 3, r() * 3, r() * 3); dummy.scale.set(s, s * 0.7, s * (0.8 + r() * 0.5)); dummy.updateMatrix(); rocks.setMatrixAt(i, dummy.matrix);
+      dummy.position.set(x, surfaceGroundAt(x, z) - 0.2 * s, z); dummy.rotation.set(r() * 3, r() * 3, r() * 3); dummy.scale.set(s, s * 0.7, s * (0.8 + r() * 0.5)); dummy.updateMatrix(); rocks.setMatrixAt(i, dummy.matrix);
+      this.obstacleColliders.push({ x, z, y: dummy.position.y, radius: 0.55 * s, height: 0.9 * s });
     }
     rocks.castShadow = true; g.add(rocks);
 
@@ -556,12 +580,12 @@ export class Drive {
 
   enter() {
     this.buildWorld();
-    if (!this.physics) this.physics = new VehiclePhysics(heightAt, this.wheels);
+    if (!this.physics) this.physics = new VehiclePhysics(heightAt, this.wheels, this.obstacleColliders);
     this.world.visible = true;
     this.active = true;
     this.fov0 = this.camera.fov;
     this.reset();
-    this.keys.clear(); this.physicalKeys.clear(); this.touch = {};
+    this._clearInputs();
     this._place(0);
     this._snapCamera();
   }
@@ -569,7 +593,7 @@ export class Drive {
   exit() {
     this.active = false;
     if (this.world) this.world.visible = false;
-    this.keys.clear(); this.physicalKeys.clear(); this.touch = {};
+    this._clearInputs();
     this.boosting = false; this.boostVis = 0; this.flame = 0; this.air = false;
     this.run = { state: 'idle', t: 0 };
     if (this.fx) this._fxHide();
@@ -605,14 +629,25 @@ export class Drive {
       if (map[e.code]) { this.physicalKeys.add(e.code); e.preventDefault(); }
     });
     window.addEventListener('keyup', e => { if (map[e.code]) this.physicalKeys.delete(e.code); });
-    window.addEventListener('blur', () => { this.keys.clear(); this.physicalKeys.clear(); this.touch = {}; });
+    window.addEventListener('blur', () => this._clearInputs());
+  }
+
+  _clearInputs() {
+    this.keys.clear(); this.physicalKeys.clear(); this.touch = {};
+    for (const entry of this._touchButtons || []) { entry.pointers.clear(); entry.button.classList.remove('held'); }
   }
 
   bindTouch(root) {
     for (const b of root.querySelectorAll('[data-k]')) {
       const k = b.dataset.k;
-      const down = e => { e.preventDefault(); this.touch[k] = (this.touch[k] || 0) + 1; b.classList.add('held'); try { b.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ } };
-      const up = e => { if (b.classList.contains('held')) { this.touch[k] = 0; b.classList.remove('held'); } };
+      const entry = { button: b, key: k, pointers: new Set() };
+      this._touchButtons.push(entry);
+      const sync = () => {
+        this.touch[k] = this._touchButtons.filter(item => item.key === k).reduce((sum, item) => sum + item.pointers.size, 0);
+        b.classList.toggle('held', entry.pointers.size > 0);
+      };
+      const down = e => { e.preventDefault(); entry.pointers.add(e.pointerId); sync(); try { b.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ } };
+      const up = e => { entry.pointers.delete(e.pointerId); sync(); };
       b.addEventListener('pointerdown', down);
       b.addEventListener('pointerup', up);
       b.addEventListener('pointercancel', up);
@@ -744,8 +779,9 @@ export class Drive {
     else if (this.air) {
       this.air = false;
       if (this.airT > 0.12) this.airCount++;
-      this.lastAir = { t: this.airT, ft: Math.round(this.airDist * 3.28084) };
+      this.lastAir = { t: this.airT, ft: Math.round(this.airDist * 3.28084), impact: r.impactSpeed };
       this.maxAirT = Math.max(this.maxAirT, this.airT);
+      this._landingDust(r.impactSpeed);
       if (this.airT > 0.5 && this.onToast) this.onToast(`AIR ${this.airT.toFixed(1)} s / ${this.lastAir.ft} ft`, 'air');
       this.airT = 0; this.airDist = 0;
     }
@@ -838,7 +874,12 @@ export class Drive {
     if (t > 0.12) this.airCount++;
     this.lastAir = { t, ft: Math.round(this.airDist * 3.28084), impact };
     this.maxAirT = Math.max(this.maxAirT, t);
-    // dust puff at the wheels
+    this._landingDust(impact);
+    if (t > 0.5 && this.onToast) this.onToast(`AIR ${t.toFixed(1)} s / ${this.lastAir.ft} ft`, 'air');
+  }
+
+  _landingDust(impact) {
+    // Dust stays behind in world space after the van lands.
     const fx = this.fx;
     if (fx && this.active && impact > 2) {
       const ch = Math.cos(this.heading), sh = Math.sin(this.heading), fog = this.scene.fog ? this.scene.fog.color : null, n = Math.min(5, 1 + (impact / 3 | 0));
@@ -848,7 +889,6 @@ export class Drive {
         fx.smoke.emit(wx, heightAt(wx, wz) + 0.2, wz, Math.cos(a) * sp, 0.6 + Math.random() * 1.2, Math.sin(a) * sp, 0.8 + Math.random() * 0.7, 0.9, 3.2 + Math.random() * 1.5, 0.55, cr, cg, cb);
       }
     }
-    if (t > 0.5 && this.onToast) this.onToast(`AIR ${t.toFixed(1)} s / ${this.lastAir.ft} ft`, 'air');
   }
 
   _updateRun(dt) {
@@ -924,7 +964,9 @@ export class Drive {
     const p = this.van.position;
     cam.position.sub(this._shk);
     if (this.camMode === 'chase') {
-      const back = 7.2 + Math.max(0, this.v) * 0.06 + 2.6 * eb;
+      // A portrait viewport has a much narrower horizontal field of view.
+      const portraitDistance = clamp(1 / Math.sqrt(cam.aspect), 1, 1.65);
+      const back = (7.2 + Math.max(0, this.v) * 0.06 + 2.6 * eb) * portraitDistance;
       const des = new THREE.Vector3(p.x - fx * back, p.y + 2.7 + 0.4 * eb, p.z - fz * back);
       const ground = heightAt(des.x, des.z) + 1.2;
       des.y = Math.max(des.y, ground);
