@@ -79,7 +79,10 @@
       <button id="btn-reset-car" class="pill">Reset</button>
       <button id="btn-exit-drive" class="pill accent">Exit drive</button>
     </div>
-    <p class="drive-help">W/&uarr; gas &middot; S/&darr; brake/reverse &middot; A/D steer &middot; Space handbrake &middot; Shift boost &middot; C camera &middot; R reset &middot; Esc exit</p>
+    <details class="drive-help">
+      <summary>Controls</summary>
+      <p>W / &uarr; gas &middot; S / &darr; brake and reverse &middot; A / D steer<br>Space handbrake &middot; Shift boost &middot; C camera &middot; R reset &middot; Esc exit</p>
+    </details>
     <div id="touch-drive">
       <div class="steer">
         <button data-k="left" aria-label="Steer left"><svg viewBox="0 0 24 24"><path d="M15 4l-8 8 8 8"/></svg></button>
@@ -107,3 +110,4 @@
 <script type="module" src="src/main.js"></script>
 </body>
 </html>
+
