@@ -55,6 +55,7 @@ export class VehiclePhysics {
     this.forward = new CANNON.Vec3();
     this.offset = new CANNON.Vec3();
     this.drag = new CANNON.Vec3();
+    this.airBoost = new CANNON.Vec3();
     this.reset();
   }
 
@@ -90,9 +91,11 @@ export class VehiclePhysics {
     // imposing an abrupt speed cutoff; fade resistance near zero to avoid jitter.
     const resistance = 1600 * (0.22 + 0.0042 * speed * speed) * clamp(speed / 0.5, -1, 1);
     this.forward.scale(-resistance, this.drag);
+    const airborneBoost = input.boost && !this.prevGrounded ? 1600 * 4 * clamp(1 - Math.max(0, speed) / 52, 0, 1) : 0;
+    this.forward.scale(airborneBoost, this.airBoost);
     const impactSpeed = Math.max(0, -b.velocity.y);
     // Smaller collision steps reduce visible penetration at boost speeds.
-    for (let i = 0; i < 2; i++) { b.applyForce(this.drag); this.world.step(STEP / 2); }
+    for (let i = 0; i < 2; i++) { b.applyForce(this.drag); if (airborneBoost) b.applyForce(this.airBoost); this.world.step(STEP / 2); }
     // Stop outward motion at the world edge instead of reporting speed while
     // the position is pinned; preserve any velocity along the boundary.
     if (b.position.x < LIMITS.minX) { b.position.x = LIMITS.minX; if (b.velocity.x < 0) b.velocity.x = 0; }
@@ -102,7 +105,8 @@ export class VehiclePhysics {
     b.quaternion.vmult(new CANNON.Vec3(0, 0, 1), this.forward);
     speed = b.velocity.dot(this.forward);
     this.speed = speed;
-    return { speed, grounded: vehicle.numWheelsOnGround > 0, impactSpeed, heading: Math.atan2(this.forward.x, this.forward.z) };
+    this.prevGrounded = vehicle.numWheelsOnGround > 0;
+    return { speed, grounded: this.prevGrounded, impactSpeed, heading: Math.atan2(this.forward.x, this.forward.z) };
   }
 
   applyVisual(van) {
