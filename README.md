@@ -65,10 +65,18 @@ src/finishes.js       material lookup and finish application, x-ray, light emiss
 src/textures.js       procedural canvas textures (wood, ply edge, fabric, floor, tent)
 src/openings.js       door/slider/tailgate/pop-top animation + pop-top tent mesh
 src/environment.js    sky, sun/moon, day-night blending, ground, headlights, cabin lights
-src/drive.js          drive world, arcade physics, chase/driver/orbit cameras, input
+src/drive.js          drive world, chase/driver/orbit cameras, input and visual effects
+src/vehicle-physics.js  cannon-es vehicle and terrain collision simulation
 src/state.js          localStorage + URL-hash persistence
 src/ui.js             panel construction
 vendor/three/         three.js r187 (module build + addons + Draco decoder), MIT licence
+vendor/cannon-es/     cannon-es 0.20.0 physics engine, MIT licence
 assets/               van.glb + manifest.json (generated, do not edit by hand)
 tools/                Blender export scripts
 ```
+
+## Regression checks
+
+With Node.js installed, run `node --experimental-vm-modules tests/regressions.cjs` and
+`node --experimental-vm-modules tests/physics.cjs`. The collision field is built once when drive
+mode is first opened; it is reused for subsequent drives.
