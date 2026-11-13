@@ -24,12 +24,15 @@ export class VehiclePhysics {
     ground.updateAABB(); // Wheel raycasts run before the first world step.
     for (const obstacle of obstacles) {
       const radius = Math.max(0.1, obstacle.radius), height = Math.max(0.5, obstacle.height);
-      const body = new CANNON.Body({ mass: 0, shape: new CANNON.Box(new CANNON.Vec3(radius, height / 2, radius)), position: new CANNON.Vec3(obstacle.x, obstacle.y + height / 2, obstacle.z) });
+      const body = new CANNON.Body({ mass: 0, collisionFilterGroup: 2, shape: new CANNON.Box(new CANNON.Vec3(radius, height / 2, radius)), position: new CANNON.Vec3(obstacle.x, obstacle.y + height / 2, obstacle.z) });
       this.world.addBody(body);
       body.updateAABB();
     }
     this.body = new CANNON.Body({ mass: 1600, shape: new CANNON.Box(new CANNON.Vec3(0.75, 0.36, 1.9)), linearDamping: 0.015, angularDamping: 0.45 });
     this.vehicle = new CANNON.RaycastVehicle({ chassisBody: this.body, indexRightAxis: 0, indexUpAxis: 1, indexForwardAxis: 2 });
+    // Cannon's vehicle uses world.rayTest for its suspension. Wheels should
+    // sample the ground, while the chassis handles impacts with obstacles.
+    this.world.rayTest = (from, to, result) => this.world.raycastClosest(from, to, { skipBackfaces: true, collisionFilterMask: 1 }, result);
     for (const w of wheels) this.vehicle.addWheel({
       chassisConnectionPointLocal: new CANNON.Vec3(w.x, -0.4, w.z), directionLocal: new CANNON.Vec3(0, -1, 0), axleLocal: new CANNON.Vec3(-1, 0, 0),
       radius: w.r, suspensionRestLength: 0.42, suspensionStiffness: 35, dampingRelaxation: 3, dampingCompression: 4.4,
@@ -75,13 +78,14 @@ export class VehiclePhysics {
     const resistance = 1600 * (0.22 + 0.0042 * speed * speed) * clamp(speed / 0.5, -1, 1);
     this.forward.scale(-resistance, this.drag);
     b.applyForce(this.drag);
+    const impactSpeed = Math.max(0, -b.velocity.y);
     this.world.step(STEP);
     b.position.x = clamp(b.position.x, LIMITS.minX, LIMITS.maxX);
     b.position.z = clamp(b.position.z, LIMITS.minZ, LIMITS.maxZ);
     b.quaternion.vmult(new CANNON.Vec3(0, 0, 1), this.forward);
     speed = b.velocity.dot(this.forward);
     this.speed = speed;
-    return { speed, grounded: vehicle.numWheelsOnGround > 0, heading: Math.atan2(this.forward.x, this.forward.z) };
+    return { speed, grounded: vehicle.numWheelsOnGround > 0, impactSpeed, heading: Math.atan2(this.forward.x, this.forward.z) };
   }
 
   applyVisual(van) {
