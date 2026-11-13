@@ -94,7 +94,7 @@ const RAMPS = [
   makeRamp(CA.x + UX * 56 - NX * 9, CA.z + UZ * 56 - NZ * 9, TRACK_H, 5.5, kicker(2.4, 10), 'double-b'),
 ];
 function rampAt(x, z) {
-  let best = 0;
+  let best = -Infinity;
   for (let k = 0; k < RAMPS.length; k++) {
     const rp = RAMPS[k], dx = x - rp.x, dz = z - rp.z;
     if (dx * dx + dz * dz > rp.rad2) continue;
@@ -102,7 +102,7 @@ function rampAt(x, z) {
     if (w > rp.W / 2 || u <= P[0][0] || u >= P[P.length - 1][0]) continue;
     let i = 0; while (u > P[i + 1][0]) i++;
     const t = (u - P[i][0]) / (P[i + 1][0] - P[i][0]);
-    const hh = (P[i][1] + (P[i + 1][1] - P[i][1]) * t) * smooth(rp.W / 2, rp.W / 2 - 0.35, w);
+    const hh = P[i][1] + (P[i + 1][1] - P[i][1]) * t;
     if (hh > best) best = hh;
   }
   return best;
@@ -148,9 +148,28 @@ export function groundAt(x, z) {
   }
   return h;
 }
-// Everything the van drives on: terrain + ramps.
+// Match the visible terrain triangles so the physics and shadow follow the mesh,
+// including the lower-resolution terrain away from the mountain.
+const surfaceSamples = new Map();
+function surfaceSample(x, z) {
+  const key = `${x},${z}`;
+  let value = surfaceSamples.get(key);
+  if (value === undefined) { value = groundAt(x, z); surfaceSamples.set(key, value); }
+  return value;
+}
+export function surfaceGroundAt(x, z) {
+  const patch = x >= 85 && x < 375 && z >= -185 && z < 105;
+  const size = patch ? 2 : 5, ox = patch ? 85 : WORLD_X0, oz = patch ? -185 : -WORLD_Z;
+  const i = Math.floor((x - ox) / size), j = Math.floor((z - oz) / size);
+  const x0 = ox + i * size, z0 = oz + j * size, u = (x - x0) / size, v = (z - z0) / size;
+  const a = surfaceSample(x0, z0), b = surfaceSample(x0 + size, z0), c = surfaceSample(x0, z0 + size), d = surfaceSample(x0 + size, z0 + size);
+  if ((i + j) & 1) return v >= u ? a * (1 - v) + c * (v - u) + d * u : a * (1 - u) + d * v + b * (u - v);
+  return u + v <= 1 ? a * (1 - u - v) + c * v + b * u : b * (1 - v) + c * (1 - u) + d * (u + v - 1);
+}
+
+// Everything the van drives on: the rendered terrain and ramps.
 export function heightAt(x, z) {
-  const g = groundAt(x, z);
+  const g = surfaceGroundAt(x, z);
   const rp = rampAt(x, z);
   return rp > g ? rp : g;
 }
@@ -423,7 +442,7 @@ export class Drive {
         let ox = nx / nl, oz = nz / nl;
         if (ox * (ROAD.xs[i] - MC.x) + oz * (ROAD.zs[i] - MC.z) < 0) { ox = -ox; oz = -oz; }
         const px = ROAD.xs[i] + ox * (ROAD_HALF + 0.5), pz = ROAD.zs[i] + oz * (ROAD_HALF + 0.5);
-        d.position.set(px, groundAt(px, pz), pz); d.updateMatrix(); posts.setMatrixAt(n++, d.matrix);
+        d.position.set(px, surfaceGroundAt(px, pz), pz); d.updateMatrix(); posts.setMatrixAt(n++, d.matrix);
       }
       posts.count = n; posts.castShadow = true; g.add(posts);
     }
@@ -487,7 +506,7 @@ export class Drive {
     let n = 0;
     const plant = (x, z) => {
       const s = 0.7 + r() * 0.8;
-      dummy.position.set(x, groundAt(x, z) - 0.1, z); dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s, s * (0.8 + r() * 0.5), s); dummy.updateMatrix();
+      dummy.position.set(x, surfaceGroundAt(x, z) - 0.1, z); dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s, s * (0.8 + r() * 0.5), s); dummy.updateMatrix();
       trunk.setMatrixAt(n, dummy.matrix); fol.setMatrixAt(n, dummy.matrix); fol2.setMatrixAt(n, dummy.matrix);
       this.obstacleColliders.push({ x, z, y: dummy.position.y, radius: 0.24 * s, height: 2.2 * dummy.scale.y });
       tc.setHSL(0.3 + r() * 0.06, 0.35, 0.22 + r() * 0.1); fol.setColorAt(n, tc); fol2.setColorAt(n, tc.offsetHSL(0, 0, 0.05));
@@ -513,7 +532,7 @@ export class Drive {
       let x, z;
       do { x = (r() * 2 - 1) * 200; z = (r() * 2 - 1) * 200; } while ((Math.abs(x) < LOT_X + 4 && Math.abs(z) < LOT_Z + 4) || Math.hypot(x - MC.x, z - MC.z) < MR + 10 || (x > 0 && distSeg(x, z, CA, CB) < 20));
       const s = 0.4 + r() * 1.4;
-      dummy.position.set(x, groundAt(x, z) - 0.2 * s, z); dummy.rotation.set(r() * 3, r() * 3, r() * 3); dummy.scale.set(s, s * 0.7, s * (0.8 + r() * 0.5)); dummy.updateMatrix(); rocks.setMatrixAt(i, dummy.matrix);
+      dummy.position.set(x, surfaceGroundAt(x, z) - 0.2 * s, z); dummy.rotation.set(r() * 3, r() * 3, r() * 3); dummy.scale.set(s, s * 0.7, s * (0.8 + r() * 0.5)); dummy.updateMatrix(); rocks.setMatrixAt(i, dummy.matrix);
       this.obstacleColliders.push({ x, z, y: dummy.position.y, radius: 0.55 * s, height: 0.9 * s });
     }
     rocks.castShadow = true; g.add(rocks);
