@@ -89,6 +89,13 @@ export class Environment {
 
   setBlobSize(w, l) { this.blob.scale.set(w * 1.35, 1, l * 1.2); }
 
+  setDriveShadow(position, heading, groundHeight) {
+    const altitude = Math.max(0, position.y - groundHeight);
+    this.blob.position.set(position.x, groundHeight + 0.025, position.z);
+    this.blob.rotation.y = heading;
+    this.blob.material.opacity = 0.85 * (1 - this.nightFactor * 0.5) * (1 - smooth(0.15, 4, altitude));
+  }
+
   setDriveFog(on) {
     this.scene.fog.near = on ? 90 : 35;
     this.scene.fog.far = on ? 560 : 130;
@@ -136,7 +143,12 @@ export class Environment {
   }
 
   // Keep the shadow frustum centred on the van.
-  setFocus(v) { this.focus.copy(v); this._place(); }
+  setFocus(v) {
+    this.focus.copy(v);
+    this.sky.position.copy(v);
+    this.night.position.copy(v);
+    this._place();
+  }
   _place() {
     if (!this._lightDir) return;
     this.sun.position.copy(this.focus).addScaledVector(this._lightDir, 25);
@@ -172,3 +184,4 @@ export class VanLights {
     for (const p of this.cabin) p.intensity = cabin * (0.4 + 1.6 * night);
   }
 }
+
