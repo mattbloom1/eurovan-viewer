@@ -303,12 +303,12 @@ function showDriveToast(text, kind) {
   toastTimer = setTimeout(() => driveToast.classList.remove('show'), kind === 'summit' ? 4500 : 2200);
 }
 const fmtTime = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
-app.enterDrive = () => {
+app.enterDrive = async () => {
   if (!app.drive) return;
   app.openings.closeAll(true);
   app.setSection(false);
   tween = null;
-  app.drive.enter();
+  await app.drive.enter();
   env.setDriveFog(true);
   document.body.classList.add('driving');
   hud.hidden = false;
