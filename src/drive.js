@@ -295,6 +295,7 @@ export class Drive {
   }
 
   reset() {
+    this._accumulator = 0; this._previousPose = null; this._currentPose = null; this._lastResult = null;
     this.x = 0; this.z = 0; this.heading = 0; this.v = 0; this.steer = 0; this.dist = 0;
     this.susP = 0; this.susPv = 0; this.susR = 0; this.susRv = 0; this.susY = 0; this.susYv = 0; this.lastV = 0; this.yawRate = 0;
     this.air = false; this.vy = 0; this.yAir = 0; this.airRx = 0; this.airRxV = 0; this.airRz = 0; this.airT = 0; this.airDist = 0;
@@ -312,6 +313,7 @@ export class Drive {
     this.x = x; this.z = z; this.heading = heading; this.v = v; this.air = false; this.vy = 0;
     this.susP = this.susPv = this.susR = this.susRv = this.susY = this.susYv = 0;
     this._place(0); this._snapCamera();
+    this._accumulator = 0; this._previousPose = null; this._currentPose = null;
   }
 
   buildWorld() {
@@ -622,11 +624,34 @@ export class Drive {
 
   input(k) { return this.keys.has(k) || [...this.physicalKeys].some(code => this.keyMap[code] === k) || (this.touch[k] || 0) > 0; }
 
-  // advance by wall-clock dt using fixed-size substeps (stable on slow frames)
+  _capturePose() {
+    return { position: this.van.position.clone(), quaternion: this.van.quaternion.clone(), wheels: this.wheels.map(w => w.node ? w.node.quaternion.clone() : null) };
+  }
+
+  _applyPose(pose) {
+    this.van.position.copy(pose.position); this.van.quaternion.copy(pose.quaternion);
+    this.wheels.forEach((w, i) => { if (w.node && pose.wheels[i]) w.node.quaternion.copy(pose.wheels[i]); });
+  }
+
+  // Simulate at a constant rate and interpolate the visible pose between steps.
   update(dt) {
-    let t = Math.min(dt, 0.5), r = null;
-    do { const h = Math.min(t, 1 / 30); r = this._step(Math.max(h, 1e-4)); t -= h; } while (t > 1e-4);
-    return r;
+    const step = 1 / 60, elapsed = Math.max(0, Math.min(dt, 0.25));
+    if (!this._currentPose) this._previousPose = this._currentPose = this._capturePose();
+    this._applyPose(this._currentPose);
+    this._accumulator += elapsed;
+    while (this._accumulator + 1e-10 >= step) {
+      this._previousPose = this._currentPose;
+      this._lastResult = this._step(step);
+      this._currentPose = this._capturePose();
+      this._accumulator -= step;
+    }
+    const alpha = clamp(this._accumulator / step, 0, 1);
+    this.van.position.lerpVectors(this._previousPose.position, this._currentPose.position, alpha);
+    this.van.quaternion.slerpQuaternions(this._previousPose.quaternion, this._currentPose.quaternion, alpha);
+    this.wheels.forEach((w, i) => { if (w.node && this._previousPose.wheels[i] && this._currentPose.wheels[i]) w.node.quaternion.slerpQuaternions(this._previousPose.wheels[i], this._currentPose.wheels[i], alpha); });
+    this._updateFx(elapsed);
+    this._updateCamera(elapsed);
+    return this._lastResult || { mph: 0, v: 0, braking: false, gear: 'N', boost: this.boost, boosting: false, air: false, timer: -1, runState: 'idle' };
   }
 
   _step(dt) {
@@ -692,8 +717,6 @@ export class Drive {
     this._place(delta, dt);
     this._updateRun(dt);
     this.boostVis += ((this.boosting ? 1 : 0) - this.boostVis) * (1 - Math.exp(-dt * (this.boosting ? 4 : 1.7)));
-    this._updateFx(dt);
-    this._updateCamera(dt);
     return { mph: Math.abs(nv) * 2.23694, v: nv, braking: brake && nv > 0.3, gear: nv < -0.1 ? 'R' : (Math.abs(nv) < 0.1 && !gas && !boosting ? 'N' : 'D'), boost: this.boost, boosting: this.boosting, air: this.air, timer: this.run.state === 'idle' ? -1 : this.run.t, runState: this.run.state };
   }
 
