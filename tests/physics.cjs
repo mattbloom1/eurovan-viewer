@@ -17,6 +17,17 @@ const vm = require('node:vm');
   ];
   const car = new physics.namespace.VehiclePhysics(drive.namespace.heightAt, wheels);
   const bodies = car.world.bodies.length;
+  const collisionField = car.world.bodies[0].shapes[0];
+  let terrainError = 0, worstTerrain;
+  for (let i = 0; i < 1200; i++) {
+    const x = 90 + (i * 37.137 % 280), z = -180 + (i * 53.271 % 280);
+    const physical = collisionField.getHeightAt(x + 300, 300 - z, true);
+    const error = Math.abs(physical - drive.namespace.surfaceGroundAt(x, z));
+    if (error > terrainError) { terrainError = error; worstTerrain = { x, z, physical, visible: drive.namespace.surfaceGroundAt(x, z), ramp: drive.namespace.heightAt(x, z) }; }
+  }
+  console.log('Maximum sampled mountain surface mismatch:', terrainError.toFixed(3), 'm', worstTerrain);
+  assert.ok(terrainError < 0.2, 'collision field should track the visible mountain terrain');
+  assert.ok(drive.namespace.heightAt(175.056, 98.848) < -1, 'terrain below sea level must not be flattened outside ramps');
   for (let i = 0; i < 90; i++) car.step({});
   assert.equal(car.vehicle.numWheelsOnGround, 4, 'van should settle on four wheels');
   let rampHeight = 0;
