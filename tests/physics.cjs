@@ -15,7 +15,9 @@ const vm = require('node:vm');
     { x: -0.7853, z: 1.447, r: 0.3379, front: true }, { x: 0.7853, z: 1.447, r: 0.338, front: true },
     { x: -0.7811, z: -1.473, r: 0.3379, front: false }, { x: 0.7811, z: -1.473, r: 0.338, front: false },
   ];
+  const setupStart = performance.now();
   const car = new physics.namespace.VehiclePhysics(drive.namespace.heightAt, wheels);
+  console.log('Initial collision-field setup:', (performance.now() - setupStart).toFixed(0), 'ms');
   const bodies = car.world.bodies.length;
   const collisionField = car.world.bodies[0].shapes[0];
   let terrainError = 0, worstTerrain;
@@ -85,7 +87,11 @@ const vm = require('node:vm');
   }
   const obstacles = [{ x: 0, y: 0, z: 16, radius: 0.3, height: 3 }];
   for (let i = 0; i < 370; i++) obstacles.push({ x: 50 + i % 20 * 4, y: 0, z: Math.floor(i / 20) * 4, radius: 0.3, height: 3 });
-  const flat = new physics.namespace.VehiclePhysics(() => 0, wheels, obstacles);
+  let yields = 0;
+  const flatHeights = await physics.namespace.VehiclePhysics.prepareTerrain(() => 0, () => { yields++; return Promise.resolve(); });
+  assert.ok(yields > 1, 'collision-field preparation should yield during startup');
+  assert.equal(flatHeights.length, 721); assert.equal(flatHeights[0].length, 601);
+  const flat = new physics.namespace.VehiclePhysics(() => 0, wheels, obstacles, flatHeights);
   flat.reset(0, 0, 0, 12);
   for (let i = 0; i < 120; i++) flat.step({ gas: true });
   assert.ok(flat.body.position.z < 15, 'the van must not drive through a tree trunk');

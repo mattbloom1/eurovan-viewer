@@ -7,13 +7,25 @@ const LIMITS = { minX: -280, maxX: 400, minZ: -280, maxZ: 280 };
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
 export class VehiclePhysics {
-  constructor(heightAt, wheels, obstacles = []) {
+  static async prepareTerrain(heightAt, yieldControl = () => new Promise(resolve => setTimeout(resolve, 0))) {
+    const heights = [];
+    for (let x = -300; x <= 420; x++) {
+      const row = [];
+      for (let z = 300; z >= -300; z--) row.push(heightAt(x, z));
+      heights.push(row);
+      // Limit uninterrupted work so the preparing message can remain responsive.
+      if ((x + 300) % 8 === 7) await yieldControl();
+    }
+    return heights;
+  }
+
+  constructor(heightAt, wheels, obstacles = [], preparedHeights = null) {
     this.heightAt = heightAt;
     this.world = new CANNON.World({ gravity: new CANNON.Vec3(0, -12, 0) });
     this.world.broadphase = new CANNON.SAPBroadphase(this.world);
-    const heights = [];
+    const heights = preparedHeights || [];
     // One collision field is prepared on entry; no terrain is rebuilt during a drive.
-    for (let x = -300; x <= 420; x++) {
+    if (!preparedHeights) for (let x = -300; x <= 420; x++) {
       const row = [];
       for (let z = 300; z >= -300; z--) row.push(heightAt(x, z));
       heights.push(row);
