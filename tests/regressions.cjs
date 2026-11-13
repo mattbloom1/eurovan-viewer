@@ -48,13 +48,38 @@ async function main() {
   }
   car.setInput('gas', true); handlers.blur(); assert.equal(car.input('gas'), false);
 
+  class Vec {
+    constructor(x = 0) { this.x = x; }
+    clone() { return new Vec(this.x); }
+    copy(v) { this.x = v.x; return this; }
+    lerpVectors(a, b, t) { this.x = a.x + (b.x - a.x) * t; return this; }
+    slerpQuaternions(a, b, t) { return this.lerpVectors(a, b, t); }
+  }
+  function simulatedCar() {
+    const c = Object.create(drive.namespace.Drive.prototype);
+    Object.assign(c, { van: { position: new Vec(), quaternion: new Vec() }, wheels: [{ node: { quaternion: new Vec() } }], _accumulator: 0, _currentPose: null, _previousPose: null, _lastResult: null, boost: 1, count: 0 });
+    c._step = function(dt) { assert.ok(Math.abs(dt - 1 / 60) < 1e-10); this.count++; this.van.position.x += dt * 6; this.wheels[0].node.quaternion.x += dt; return { mph: 1 }; };
+    c._updateFx = () => {}; c._updateCamera = () => {};
+    return c;
+  }
+  const half = simulatedCar(); half.update(1 / 60); half.update(1 / 120);
+  assert.ok(Math.abs(half.van.position.x - 0.05) < 1e-9, 'pose should interpolate between physics states');
+  assert.ok(Math.abs(half.wheels[0].node.quaternion.x - 1 / 120) < 1e-9, 'wheel pose should interpolate too');
+  for (const fps of [30, 60, 144]) {
+    const c = simulatedCar(); for (let i = 0; i < fps; i++) c.update(1 / fps);
+    assert.equal(c.count, 60, `${fps} fps must produce 60 fixed physics steps`);
+    assert.ok(Math.abs(c.van.position.x - 5.9) < 1e-8, `${fps} fps should produce the same rendered pose`);
+  }
+  const stalled = simulatedCar(); stalled.update(2);
+  assert.equal(stalled.count, 15, 'long stalls must be bounded');
+
   const source = fs.readFileSync('src/main.js', 'utf8');
   const reset = source.match(/app\.reset = \(\) => \{[\s\S]*?\n\};/)[0];
   const resetContext = vm.createContext({ DEFAULTS: { hour: 14 }, clearSaved() {}, defaultHidden: () => [], applyState() {}, saveState() {}, goView() {}, toast() {}, ui: { sync() {} }, app: { closeAll() {}, setSection() {} } });
   vm.runInContext('let hourTween = { from: 14, to: 22, t: 0.5 };\n' + reset + '\napp.reset(); globalThis.result = { hourTween, hour: app.state.hour };', resetContext);
   assert.equal(resetContext.result.hourTween, null);
   assert.equal(resetContext.result.hour, 14);
-  console.log('Regression checks passed: shared state, keyboard inputs, and reset during time transition.');
+  console.log('Regression checks passed: shared state, keyboard inputs, reset, and fixed-step interpolation.');
 }
 main().catch(err => { console.error(err); process.exitCode = 1; });
 
