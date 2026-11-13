@@ -89,7 +89,7 @@ const vm = require('node:vm');
   flat.reset(0, 0, 0, 12);
   for (let i = 0; i < 120; i++) flat.step({ gas: true });
   assert.ok(flat.body.position.z < 15, 'the van must not drive through a tree trunk');
-  flat.reset(0, 0, 0, 28);
+  flat.reset(0, 0, 0, 52);
   let furthest = flat.body.position.z;
   for (let i = 0; i < 75; i++) { flat.step({}); furthest = Math.max(furthest, flat.body.position.z); }
   assert.ok(furthest < 16, 'the van must not tunnel through a tree at boost speed');
