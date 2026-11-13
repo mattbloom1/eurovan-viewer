@@ -59,6 +59,20 @@ async function main() {
   assert.ok(classes.has('held'));
   handlers.blur();
   assert.equal(car.input('gas'), false); assert.ok(!classes.has('held'), 'blur must clear held button visuals');
+  const lighting = Object.create(drive.namespace.Drive.prototype);
+  lighting.lotBulbMaterial = { emissiveIntensity: 0 };
+  lighting.lotLamps = [{ visible: false, intensity: 0 }];
+  lighting.setNight(1);
+  assert.equal(lighting.lotLamps[0].visible, true); assert.ok(lighting.lotLamps[0].intensity > 0);
+  lighting.setNight(0);
+  assert.equal(lighting.lotLamps[0].visible, false); assert.equal(lighting.lotBulbMaterial.emissiveIntensity, 0);
+  const orbit = Object.create(drive.namespace.Drive.prototype);
+  const settable = () => ({ set(x, y, z) { Object.assign(this, { x, y, z }); } });
+  Object.assign(orbit, { camMode: 'driver', heading: 0, van: { position: { x: 10, y: 3, z: 20 } }, camera: { aspect: 1, position: settable() }, controls: { target: settable(), update() {} }, _shk: settable() });
+  orbit.cycleCamera();
+  assert.equal(orbit.camMode, 'orbit');
+  assert.equal(orbit.camera.position.z, 12, 'orbit should start outside the van after the driver view');
+  assert.equal(orbit.controls.target.y, 4.1, 'orbit target should follow the van elevation');
 
   class Vec {
     constructor(x = 0) { this.x = x; }

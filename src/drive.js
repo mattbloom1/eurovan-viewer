@@ -491,9 +491,13 @@ export class Drive {
     cones.castShadow = true; g.add(cones);
     // light poles
     const poleMat = new THREE.MeshStandardMaterial({ color: 0x55585c, roughness: 0.6, metalness: 0.4 });
+    this.lotLamps = [];
+    this.lotBulbMaterial = new THREE.MeshStandardMaterial({ color: 0xe6dfc7, emissive: 0xffd891, emissiveIntensity: 0, roughness: 0.65 });
     for (const [x, z] of [[-20, 0], [20, 0], [-LOT_X + 2, LOT_Z - 2], [LOT_X - 2, -LOT_Z + 2]]) {
       const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 7, 8).translate(0, 3.5, 0), poleMat);
       const head = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 0.35), poleMat); head.position.set(0, 7, 0);
+      const bulb = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.035, 0.25), this.lotBulbMaterial); bulb.position.set(0, -0.1, 0); head.add(bulb);
+      const light = new THREE.PointLight(0xffd7a0, 0, 18, 2); light.position.set(0, 6.8, 0); light.visible = false; pole.add(light); this.lotLamps.push(light);
       pole.position.set(x, 0, z); pole.add(head); pole.castShadow = true; g.add(pole);
       this.obstacleColliders.push({ x, z, y: 0, radius: 0.12, height: 7 });
     }
@@ -542,6 +546,13 @@ export class Drive {
     g.visible = false;
     this.scene.add(g);
     this.world = g;
+    this.setNight(this._night || 0);
+  }
+
+  setNight(night) {
+    this._night = clamp(night, 0, 1);
+    if (this.lotBulbMaterial) this.lotBulbMaterial.emissiveIntensity = this._night * 2;
+    for (const light of this.lotLamps || []) { light.visible = this._night > 0.02; light.intensity = this._night * 45; }
   }
 
   // boost flames (twin jets at the rear), sparks, smoke / dust, and the rear flame light
@@ -614,7 +625,10 @@ export class Drive {
     this.camMode = { chase: 'driver', driver: 'orbit', orbit: 'chase' }[this.camMode];
     this.controls.enabled = this.camMode === 'orbit';
     if (this.camMode === 'orbit') {
-      this.controls.target.set(this.x, 1.1, this.z);
+      const p = this.van.position;
+      const distance = 8 * clamp(1 / Math.sqrt(this.camera.aspect), 1, 1.65);
+      this.camera.position.set(p.x - Math.sin(this.heading) * distance, p.y + 3, p.z - Math.cos(this.heading) * distance);
+      this.controls.target.set(p.x, p.y + 1.1, p.z);
       this.controls.update();
     }
     this._camInit = false; this._shk.set(0, 0, 0);

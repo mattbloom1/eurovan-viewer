@@ -147,6 +147,7 @@ function updateLights(brake = 0) {
   const cabin = s.cabin ? 1 : 0;
   app.finishes && app.finishes.setLights({ head, brake, cabin, night });
   app.lights && app.lights.set({ head, cabin, night });
+  app.drive && app.drive.setNight(night);
   app.openings && app.openings.setTentGlow(cabin * night * 0.35);
   document.body.classList.toggle('night', night > 0.5);
 }
