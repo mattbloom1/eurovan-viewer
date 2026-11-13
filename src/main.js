@@ -307,8 +307,8 @@ app.enterDrive = () => {
   app.openings.closeAll(true);
   app.setSection(false);
   tween = null;
-  env.setDriveFog(true);
   app.drive.enter();
+  env.setDriveFog(true);
   document.body.classList.add('driving');
   hud.hidden = false;
   updateViewOffset();
