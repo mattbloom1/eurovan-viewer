@@ -643,6 +643,8 @@ export class Drive {
     this.keyMap = map;
     window.addEventListener('keydown', e => {
       if (!this.active) return;
+      // Space must still activate focused buttons and the controls disclosure.
+      if (e.code === 'Space' && e.target && typeof e.target.closest === 'function' && e.target.closest('button, summary, input, select, textarea, a[href]')) return;
       if (map[e.code]) { this.physicalKeys.add(e.code); e.preventDefault(); }
     });
     window.addEventListener('keyup', e => { if (map[e.code]) this.physicalKeys.delete(e.code); });
