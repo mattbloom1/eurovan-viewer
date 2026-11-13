@@ -80,8 +80,12 @@ export class VehiclePhysics {
     b.applyForce(this.drag);
     const impactSpeed = Math.max(0, -b.velocity.y);
     this.world.step(STEP);
-    b.position.x = clamp(b.position.x, LIMITS.minX, LIMITS.maxX);
-    b.position.z = clamp(b.position.z, LIMITS.minZ, LIMITS.maxZ);
+    // Stop outward motion at the world edge instead of reporting speed while
+    // the position is pinned; preserve any velocity along the boundary.
+    if (b.position.x < LIMITS.minX) { b.position.x = LIMITS.minX; if (b.velocity.x < 0) b.velocity.x = 0; }
+    if (b.position.x > LIMITS.maxX) { b.position.x = LIMITS.maxX; if (b.velocity.x > 0) b.velocity.x = 0; }
+    if (b.position.z < LIMITS.minZ) { b.position.z = LIMITS.minZ; if (b.velocity.z < 0) b.velocity.z = 0; }
+    if (b.position.z > LIMITS.maxZ) { b.position.z = LIMITS.maxZ; if (b.velocity.z > 0) b.velocity.z = 0; }
     b.quaternion.vmult(new CANNON.Vec3(0, 0, 1), this.forward);
     speed = b.velocity.dot(this.forward);
     this.speed = speed;
