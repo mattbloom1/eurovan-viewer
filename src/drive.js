@@ -320,6 +320,7 @@ export class Drive {
   buildWorld() {
     if (this.world) return;
     const g = new THREE.Group(); g.name = 'DriveWorld';
+    this.obstacleColliders = [];
     // ---- terrain: coarse base mesh with a hole + finer patch over the mountain, normals/colours from the height function
     const grassA = new THREE.Color(0x56703a), grassB = new THREE.Color(0x7c8a48), dirt = new THREE.Color(0x8a7656), rock = new THREE.Color(0x7d7b74);
     const alpine = new THREE.Color(0x8c8a5a), snow = new THREE.Color(0xdde3e8), roadC = new THREE.Color(0x9c8159), rockD = new THREE.Color(0x65625c), c = new THREE.Color();
@@ -474,6 +475,7 @@ export class Drive {
       const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 7, 8).translate(0, 3.5, 0), poleMat);
       const head = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.18, 0.35), poleMat); head.position.set(0, 7, 0);
       pole.position.set(x, 0, z); pole.add(head); pole.castShadow = true; g.add(pole);
+      this.obstacleColliders.push({ x, z, y: 0, radius: 0.12, height: 7 });
     }
     // trees (trunk + two foliage cones): scattered over the world and on the lower mountain slopes (road kept clear), rocks
     const nearRamp = (x, z, pad) => RAMPS.some(rp => Math.hypot(x - rp.x, z - rp.z) < rp.pts[rp.pts.length - 1][0] + rp.W + pad);
@@ -487,6 +489,7 @@ export class Drive {
       const s = 0.7 + r() * 0.8;
       dummy.position.set(x, groundAt(x, z) - 0.1, z); dummy.rotation.set(0, r() * 6, 0); dummy.scale.set(s, s * (0.8 + r() * 0.5), s); dummy.updateMatrix();
       trunk.setMatrixAt(n, dummy.matrix); fol.setMatrixAt(n, dummy.matrix); fol2.setMatrixAt(n, dummy.matrix);
+      this.obstacleColliders.push({ x, z, y: dummy.position.y, radius: 0.24 * s, height: 2.2 * dummy.scale.y });
       tc.setHSL(0.3 + r() * 0.06, 0.35, 0.22 + r() * 0.1); fol.setColorAt(n, tc); fol2.setColorAt(n, tc.offsetHSL(0, 0, 0.05));
       n++;
     };
@@ -511,6 +514,7 @@ export class Drive {
       do { x = (r() * 2 - 1) * 200; z = (r() * 2 - 1) * 200; } while ((Math.abs(x) < LOT_X + 4 && Math.abs(z) < LOT_Z + 4) || Math.hypot(x - MC.x, z - MC.z) < MR + 10 || (x > 0 && distSeg(x, z, CA, CB) < 20));
       const s = 0.4 + r() * 1.4;
       dummy.position.set(x, groundAt(x, z) - 0.2 * s, z); dummy.rotation.set(r() * 3, r() * 3, r() * 3); dummy.scale.set(s, s * 0.7, s * (0.8 + r() * 0.5)); dummy.updateMatrix(); rocks.setMatrixAt(i, dummy.matrix);
+      this.obstacleColliders.push({ x, z, y: dummy.position.y, radius: 0.55 * s, height: 0.9 * s });
     }
     rocks.castShadow = true; g.add(rocks);
 
@@ -556,7 +560,7 @@ export class Drive {
 
   enter() {
     this.buildWorld();
-    if (!this.physics) this.physics = new VehiclePhysics(heightAt, this.wheels);
+    if (!this.physics) this.physics = new VehiclePhysics(heightAt, this.wheels, this.obstacleColliders);
     this.world.visible = true;
     this.active = true;
     this.fov0 = this.camera.fov;
