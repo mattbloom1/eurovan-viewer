@@ -48,6 +48,17 @@ async function main() {
     handlers.keyup(event(b)); assert.equal(car.input(action), false);
   }
   car.setInput('gas', true); handlers.blur(); assert.equal(car.input('gas'), false);
+  const touchHandlers = {}, classes = new Set();
+  const button = { dataset: { k: 'gas' }, classList: { toggle: (name, on) => on ? classes.add(name) : classes.delete(name), remove: name => classes.delete(name) }, addEventListener: (name, fn) => { touchHandlers[name] = fn; }, setPointerCapture() {} };
+  car._touchButtons = [];
+  car.bindTouch({ querySelectorAll: () => [button] });
+  const pointer = pointerId => ({ pointerId, preventDefault() {} });
+  touchHandlers.pointerdown(pointer(1)); touchHandlers.pointerdown(pointer(2));
+  touchHandlers.pointerup(pointer(1)); touchHandlers.lostpointercapture(pointer(1));
+  assert.equal(car.input('gas'), true, 'releasing one finger must leave the other active');
+  assert.ok(classes.has('held'));
+  handlers.blur();
+  assert.equal(car.input('gas'), false); assert.ok(!classes.has('held'), 'blur must clear held button visuals');
 
   class Vec {
     constructor(x = 0) { this.x = x; }
