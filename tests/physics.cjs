@@ -68,20 +68,44 @@ const vm = require('node:vm');
   for (let i = 0; i < 120; i++) car.step({ gas: true });
   assert.ok(Number.isFinite(car.body.position.y), 'mountain drive must remain finite');
   assert.ok(car.body.position.y > drive.namespace.heightAt(car.body.position.x, car.body.position.z) - 1, 'van should remain above the mountain terrain');
+  for (const ramp of drive.namespace.WORLD_INFO.RAMPS) {
+    const downhillApproach = ramp.tag === 'big-landing';
+    const start = downhillApproach ? ramp.pts[ramp.pts.length - 1][0] + 5 : ramp.pts[0][0] - 5;
+    const dx = Math.sin(ramp.h), dz = Math.cos(ramp.h), direction = downhillApproach ? -1 : 1;
+    const x = ramp.x + dx * start, z = ramp.z + dz * start;
+    car.reset(x, z, ramp.h + (downhillApproach ? Math.PI : 0), 12);
+    let progressed = 0, minClearance = Infinity;
+    for (let i = 0; i < 120; i++) {
+      car.step({ gas: true });
+      progressed = Math.max(progressed, ((car.body.position.x - x) * dx + (car.body.position.z - z) * dz) * direction);
+      minClearance = Math.min(minClearance, car.body.position.y - drive.namespace.heightAt(car.body.position.x, car.body.position.z));
+    }
+    assert.ok(progressed > 8, `${ramp.tag}: van should approach and cross the ramp`);
+    assert.ok(minClearance > -0.5, `${ramp.tag}: van should stay above the course`);
+  }
   const obstacles = [{ x: 0, y: 0, z: 16, radius: 0.3, height: 3 }];
   for (let i = 0; i < 370; i++) obstacles.push({ x: 50 + i % 20 * 4, y: 0, z: Math.floor(i / 20) * 4, radius: 0.3, height: 3 });
   const flat = new physics.namespace.VehiclePhysics(() => 0, wheels, obstacles);
   flat.reset(0, 0, 0, 12);
   for (let i = 0; i < 120; i++) flat.step({ gas: true });
   assert.ok(flat.body.position.z < 15, 'the van must not drive through a tree trunk');
+  flat.reset(0, 0, 0, 28);
+  let furthest = flat.body.position.z;
+  for (let i = 0; i < 75; i++) { flat.step({}); furthest = Math.max(furthest, flat.body.position.z); }
+  assert.ok(furthest < 16, 'the van must not tunnel through a tree at boost speed');
   flat.reset(12, 0, 0, 12);
   for (let i = 0; i < 60; i++) flat.step({ hand: true });
   const handbrakeSpeed = Math.abs(flat.speed);
+  console.log('Handbrake speed after one second from 12 m/s:', handbrakeSpeed.toFixed(2), 'm/s');
   assert.ok(flat.speed > 0, 'handbrake should not reverse a forward-moving van on level ground');
   flat.reset(12, 0, 0, 12);
   for (let i = 0; i < 60; i++) flat.step({ brake: true });
   assert.ok(handbrakeSpeed > 3, 'handbrake should not stop a moving van instantly');
   assert.ok(handbrakeSpeed > Math.abs(flat.speed) + 1, 'handbrake should be gentler than the foot brake');
+  flat.reset(12, 0, 0, 5);
+  const profileStart = performance.now();
+  for (let i = 0; i < 600; i++) flat.step({ gas: true });
+  console.log('Average physics step with 371 obstacles:', ((performance.now() - profileStart) / 600).toFixed(3), 'ms');
   console.log('Physics checks passed: ramps, terrain, trees, brakes, coasting, reverse, steering and reset.');
 })().catch(e => { console.error(e); process.exitCode = 1; });
 
