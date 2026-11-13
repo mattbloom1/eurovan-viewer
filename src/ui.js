@@ -221,7 +221,7 @@ export class UI {
       driveError.hidden = true;
       // Let the browser show feedback before building the world and collision field.
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-      try { a.enterDrive(); }
+      try { await a.enterDrive(); }
       catch (error) { console.error('[drive] could not start', error); a.exitDrive(); driveError.textContent = 'Could not start driving. Please try again.'; driveError.hidden = false; }
       finally { driveButton.disabled = false; driveButton.textContent = 'Start driving'; }
     });
