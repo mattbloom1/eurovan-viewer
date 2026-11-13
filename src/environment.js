@@ -70,7 +70,7 @@ export class Environment {
     this.focus = new THREE.Vector3();
 
     // showroom ground
-    const groundMat = new THREE.MeshStandardMaterial({ color: 0xb7b3a8, roughness: 0.96, metalness: 0 });
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x8c877d, roughness: 0.96, metalness: 0 });
     this.ground = new THREE.Mesh(new THREE.CircleGeometry(140, 64).rotateX(-Math.PI / 2), groundMat);
     this.ground.receiveShadow = true;
     this.ground.name = 'Showroom_Ground';
@@ -115,21 +115,21 @@ export class Environment {
     const sunCol = new THREE.Color(0xffffff).lerp(new THREE.Color(0xffb070), warm);
     const moonI = 0.45 * night;
     this.sun.color.copy(sunCol).lerp(new THREE.Color(0x9fb6ff), night);
-    this.sun.intensity = 3.2 * dayI + moonI;
+    this.sun.intensity = 2.6 * dayI + moonI;
     this._lightDir = elev > -3 ? this.sunDir.clone() : new THREE.Vector3().setFromSphericalCoords(1, 50 * D2R, (az + 160) * D2R);
     this._lightDir.y = Math.max(this._lightDir.y, 0.12);
     this._lightDir.normalize();
 
     this.hemi.color.set(0xcfe3ff).lerp(new THREE.Color(0x26355a), night);
     this.hemi.groundColor.set(0x6b6250).lerp(new THREE.Color(0x0a0c12), night);
-    this.hemi.intensity = 0.55 * (1 - night) + 0.35 * night;
-    this.scene.environmentIntensity = 0.9 * (1 - night) + 0.06 * night;
+    this.hemi.intensity = 0.4 * (1 - night) + 0.35 * night;
+    this.scene.environmentIntensity = 0.6 * (1 - night) + 0.06 * night;
     this.scene.backgroundIntensity = 1;
 
-    const fogDay = new THREE.Color(0xdfe6ea).lerp(new THREE.Color(0xe7c9a8), warm * (1 - night));
+    const fogDay = new THREE.Color(0xc9d1d6).lerp(new THREE.Color(0xe7c9a8), warm * (1 - night));
     this.scene.fog.color.copy(fogDay).lerp(new THREE.Color(0x343f5e), night);
-    this.ground.material.color.set(0xb7b3a8).lerp(new THREE.Color(0x4a4a4e), night * 0.6);
-    this.renderer.toneMappingExposure = 0.85 + 0.25 * night;
+    this.ground.material.color.set(0x8c877d).lerp(new THREE.Color(0x4a4a4e), night * 0.6);
+    this.renderer.toneMappingExposure = 0.66 + 0.4 * night;
     this.blob.material.opacity = 0.85 * (1 - night * 0.5);
     this._place();
     return night;
@@ -161,7 +161,7 @@ export class VanLights {
     this.cabin = [];
     const zc = (bounds.min.z + bounds.max.z) / 2;
     for (const dz of [-0.2, -1.4]) {
-      const p = new THREE.PointLight(0xffb468, 0, 2.1, 2);
+      const p = new THREE.PointLight(0xffb468, 0, 1.6, 2);
       p.position.set(0, bounds.min.y + 1.6, zc + dz);
       van.add(p);
       this.cabin.push(p);
@@ -169,6 +169,6 @@ export class VanLights {
   }
   set({ head = 0, cabin = 0, night = 0 }) {
     for (const s of this.heads) s.intensity = head * 140;
-    for (const p of this.cabin) p.intensity = cabin * (0.6 + 4.5 * night);
+    for (const p of this.cabin) p.intensity = cabin * (0.4 + 1.6 * night);
   }
 }
