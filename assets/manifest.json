@@ -1,9 +1,9 @@
 {
- "version": "v33-wip-m3",
- "exported": "2026-11-13T20:13:09-07:00",
- "source": "m3_copy.blend",
- "total_tris": 655082,
- "glb_bytes": 2444408,
+ "version": "v33",
+ "exported": "2026-11-15T07:04:41-07:00",
+ "source": "v33_copy.blend",
+ "total_tris": 661230,
+ "glb_bytes": 2464432,
  "bounds": {
   "min": [
    -1.0901,
@@ -19,7 +19,7 @@
  "nodes": [
   {
    "name": "Body",
-   "tris": 267016,
+   "tris": 268460,
    "bounds": {
     "min": [
      -0.9235,
@@ -259,7 +259,7 @@
   },
   {
    "name": "Door_L_Pivot",
-   "tris": 16788,
+   "tris": 18268,
    "bounds": {
     "min": [
      0.6836,
@@ -269,13 +269,13 @@
     "max": [
      1.0903,
      1.7885,
-     1.295
+     1.2935
     ]
    }
   },
   {
    "name": "Door_R_Pivot",
-   "tris": 17606,
+   "tris": 20004,
    "bounds": {
     "min": [
      -1.0901,
@@ -285,13 +285,13 @@
     "max": [
      -0.6836,
      1.7884,
-     1.295
+     1.2934
     ]
    }
   },
   {
    "name": "Slider_Pivot",
-   "tris": 12282,
+   "tris": 13300,
    "bounds": {
     "min": [
      -0.92,
@@ -307,7 +307,7 @@
   },
   {
    "name": "Tailgate_Pivot",
-   "tris": 38389,
+   "tris": 38197,
    "bounds": {
     "min": [
      -0.8821,
@@ -406,15 +406,15 @@
   {
    "name": "Door_L_Pivot",
    "position": [
-    0.8676,
+    0.8777,
     0.9,
-    1.285
+    1.2777
    ],
    "type": "hinge",
    "axis": [
-    0.0,
-    1.0,
-    0.0
+    -0.0872,
+    0.9962,
+    -0.0
    ],
    "open": -1.1345,
    "open_degrees": -65.0
@@ -422,15 +422,15 @@
   {
    "name": "Door_R_Pivot",
    "position": [
-    -0.8676,
+    -0.8777,
     0.9,
-    1.285
+    1.2777
    ],
    "type": "hinge",
    "axis": [
-    0.0,
-    1.0,
-    0.0
+    0.0872,
+    0.9962,
+    -0.0
    ],
    "open": 1.1345,
    "open_degrees": 65.0

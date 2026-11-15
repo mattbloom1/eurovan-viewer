@@ -427,6 +427,17 @@ PIVOT_POS = {"Door_L": world_loc("Door_L_Pivot"), "Door_R": world_loc("Door_R_Pi
              "PopTop": POPTOP_POS}
 for w in ("FL", "FR", "RL", "RR"):
     PIVOT_POS["Wheel_" + w] = world_loc("Wheel_" + w)
+
+
+def door_axis(name):
+    """Hinge axis of a front door = the pivot empty's local Z in world space (tilted from v33 on), as glTF coords."""
+    z = (bpy.data.objects[name].matrix_world.to_3x3() @ Vector((0.0, 0.0, 1.0))).normalized()
+    if z.z < 0:
+        z = -z
+    return (z.x, z.z, -z.y)
+
+
+DOOR_AXIS = {"Door_L": door_axis("Door_L_Pivot"), "Door_R": door_axis("Door_R_Pivot")}
 # rename originals so exported names do not get .001 suffixes
 for _o in list(bpy.data.objects):
     _o.name = "src_" + _o.name
@@ -584,8 +595,8 @@ def hinge(k, axis, mag, outward):
             "open": round(s * mag, 4), "open_degrees": round(s * math.degrees(mag), 2)}
 
 
-pivots = [hinge("Door_L", (0, 1, 0), math.radians(65), (1, 0, 0)),
-          hinge("Door_R", (0, 1, 0), math.radians(65), (-1, 0, 0))]
+pivots = [hinge("Door_L", DOOR_AXIS["Door_L"], math.radians(65), (1, 0, 0)),
+          hinge("Door_R", DOOR_AXIS["Door_R"], math.radians(65), (-1, 0, 0))]
 sc_x = centroid("Slider")[0]
 out = (-1.0 if sc_x < 0 else 1.0, 0.0, 0.0)
 pivots.append({"name": "Slider_Pivot", "position": rnd(list(gl_vec(PIVOT_POS["Slider"]))), "type": "slide",
