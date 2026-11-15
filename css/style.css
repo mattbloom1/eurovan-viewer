@@ -188,6 +188,25 @@ body.touch .speedo { bottom: auto; top: calc(70px + var(--safe-t)); }
 body.touch #drive-toast { font-size: 26px; top: 30%; }
 body.touch #drive-toast.summit { font-size: 32px; }
 
+/* ---------- car settings (Drive tab + in-drive overlay) ---------- */
+.tuner .tn-presets { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 4px 0 10px; }
+.tuner .tn-presets .btn { min-height: 44px; }
+.tn-group { border-top: 1px solid var(--line); }
+.tn-group summary { cursor: pointer; padding: 11px 2px; font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); min-height: 44px; display: flex; align-items: center; }
+.tn-row { display: grid; grid-template-columns: 1fr auto; column-gap: 10px; align-items: center; padding: 0 2px 6px; }
+.tn-row label { font-size: 13.5px; font-weight: 550; }
+.tn-row output { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); white-space: nowrap; }
+.tn-row input[type=range] { grid-column: 1 / -1; height: 36px; margin: 0; touch-action: pan-y; }
+.tuner > .btn.wide { margin-top: 10px; width: 100%; }
+#tune-panel .tn-presets { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+#tune-panel .tn-presets .btn { min-height: 44px; padding: 8px 4px; font-size: 13px; }
+#tune-panel[hidden] { display: none; }
+#tune-panel { position: absolute; top: calc(70px + var(--safe-t)); right: calc(16px + var(--safe-r)); width: min(340px, calc(100vw - 24px)); max-height: calc(100% - 150px - var(--safe-t) - var(--safe-b)); display: flex; flex-direction: column; background: var(--paper); border-radius: var(--radius); box-shadow: var(--shadow); pointer-events: auto; overflow: hidden; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+#tune-panel .tn-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px 6px 16px; border-bottom: 1px solid var(--line); flex: none; }
+#tune-panel .tn-x { border: 0; background: transparent; font-size: 28px; line-height: 1; width: 44px; height: 44px; cursor: pointer; color: var(--ink-2); }
+#tune-panel .tn-body { overflow-y: auto; padding: 4px 14px 14px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+#tune-panel :is(button, summary, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 body.driving #brand, body.driving #views, body.driving #quick, body.driving #panel, body.driving #foot { display: none; }
 
 /* ---------- phones: bottom sheet ---------- */
@@ -215,6 +234,11 @@ body.driving #brand, body.driving #views, body.driving #quick, body.driving #pan
   body.panel-closed #toast { bottom: calc(80px + var(--safe-b)); }
   .cards { grid-template-columns: repeat(4, 1fr); }
   .drive-top .pill { padding: 9px 13px; font-size: 13px; min-height: 42px; }
+  /* keep the pedals, boost and steering buttons usable: the overlay stops above them (portrait) / sits between them (landscape) */
+  #tune-panel { top: calc(64px + var(--safe-t)); right: 12px; left: 12px; width: auto; max-height: calc(100% - 64px - 216px - var(--safe-t) - var(--safe-b)); }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  #tune-panel { left: 50%; right: auto; transform: translateX(-50%); width: min(340px, calc(100vw - 380px)); top: calc(56px + var(--safe-t)); max-height: calc(100% - 64px - var(--safe-t) - var(--safe-b)); }
 }
 @media (max-width: 380px) {
   .chip { padding: 8px 7px; font-size: 12.5px; }

@@ -24,7 +24,10 @@ function sanitize(obj) {
   for (const [k, def] of Object.entries(DEFAULTS)) {
     if (!(k in obj)) continue;
     const v = obj[k];
-    if (Array.isArray(def)) { if (Array.isArray(v)) out[k] = v.filter(x => typeof x === 'string').slice(0, 64); }
+    if (k === 'tune') {
+      // range-checking happens in clampTune(); here only keep plain {shortKey: finite number}
+      if (v && typeof v === 'object' && !Array.isArray(v)) out.tune = Object.fromEntries(Object.entries(v).filter(([n, x]) => /^[a-z]{1,4}$/.test(n) && typeof x === 'number' && Number.isFinite(x)).slice(0, 32));
+    } else if (Array.isArray(def)) { if (Array.isArray(v)) out[k] = v.filter(x => typeof x === 'string').slice(0, 64); }
     else if (typeof v === typeof def) out[k] = v;
   }
   if (typeof out.hour === 'number') out.hour = Math.max(0, Math.min(24, out.hour));
@@ -51,7 +54,7 @@ function diff(s) {
   const d = {};
   for (const [k, def] of Object.entries(DEFAULTS)) {
     const v = s[k];
-    if (Array.isArray(def) ? JSON.stringify(v) !== JSON.stringify(def) : v !== def) d[k] = v;
+    if (typeof def === 'object' ? JSON.stringify(v) !== JSON.stringify(def) : v !== def) d[k] = v;
   }
   return d;
 }

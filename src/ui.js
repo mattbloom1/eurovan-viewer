@@ -1,6 +1,7 @@
 // DOM panel: builds the five tabs and keeps controls in sync with the app state.
 import { PAINTS, PAINT_FINISHES, WOODS, DOOR_COLORS, UPHOLSTERY, SEAT_COLORS, FLOORS, BUILDOUT_NAMES } from './config.js';
 import { woodThumb, floorThumb } from './textures.js';
+import { TUNE_DEFS, TUNE_DEFAULTS, TUNE_PRESETS, compactTune } from './vehicle-physics.js';
 
 const h = (tag, attrs = {}, ...kids) => {
   const el = document.createElement(tag);
@@ -108,6 +109,35 @@ export class UI {
     input.addEventListener('change', () => set(input.checked));
     this.syncers.push(() => { input.checked = !!get(); });
     return h('div', { class: 'row' }, h('label', { for: id }, label, sub ? h('span', { class: 'sub' }, sub) : null), h('span', { class: 'switch' }, input, h('span')));
+  }
+
+  // "Car settings": presets, grouped sliders and a reset button. Built twice (Drive tab and the in-drive overlay)
+  // so ids are prefixed; both copies are kept in sync through this.syncers.
+  tuner(prefix, openFirstOnly) {
+    const a = this.app, cur = () => ({ ...TUNE_DEFAULTS, ...a.state.tune });
+    const wrap = h('div', { class: 'tuner' });
+    const fmt = (d, v) => (d.step < 1 ? v.toFixed(1) : String(Math.round(v))) + (d.unit ? (d.unit === '%' || d.unit === '°' ? '' : ' ') + d.unit : '');
+    const presets = h('div', { class: 'tn-presets' });
+    const pbtns = TUNE_PRESETS.map(p => { const b = h('button', { class: 'btn', type: 'button', onclick: () => a.applyTunePreset(p.id) }, p.name); presets.append(b); return [b, p]; });
+    this.syncers.push(() => { const now = JSON.stringify(compactTune(a.state.tune)); for (const [b, p] of pbtns) b.classList.toggle('on', JSON.stringify(compactTune(p.values)) === now); });
+    wrap.append(presets);
+    for (const group of [...new Set(TUNE_DEFS.map(d => d.group))]) {
+      const det = h('details', { class: 'tn-group' }, h('summary', {}, group));
+      if (group === 'Engine' || !openFirstOnly) det.open = true;
+      for (const d of TUNE_DEFS.filter(x => x.group === group)) {
+        const id = `${prefix}-${d.key}`, out = h('output', { for: id });
+        const input = h('input', { type: 'range', id, min: d.min, max: d.max, step: d.step, value: d.def });
+        input.addEventListener('input', () => a.setTune({ [d.key]: +input.value }));
+        // a focused slider must never keep eating the driving keys: hand focus back to the canvas
+        const release = () => { if (a.drive && a.drive.active) { input.blur(); document.getElementById('c').focus(); } };
+        input.addEventListener('pointerup', release); input.addEventListener('change', release);
+        this.syncers.push(() => { const v = cur()[d.key]; input.value = v; out.textContent = fmt(d, v); });
+        det.append(h('div', { class: 'tn-row' }, h('label', { for: id }, d.label), out, input));
+      }
+      wrap.append(det);
+    }
+    wrap.append(h('button', { class: 'btn ghost wide', type: 'button', onclick: () => a.resetTune() }, 'Reset car settings to defaults'));
+    return wrap;
   }
 
   build() {
@@ -226,7 +256,9 @@ export class UI {
       finally { driveButton.disabled = false; driveButton.textContent = 'Start driving'; }
     });
     gDr.append(driveButton, driveError);
-    gDr.append(h('p', { class: 'note' }, 'Keyboard: W / ↑ gas, S / ↓ brake then reverse, A D / ← → steer, Space handbrake, Shift boost, C camera, R reset, Esc exit. On a phone, use the on-screen pedals and steering buttons.'));
+    gDr.append(h('h3', { style: 'margin-top:16px' }, 'Car settings'), this.tuner('tp', true));
+    document.querySelector('#tune-panel .tn-body').append(this.tuner('tg', true));
+    gDr.append(h('p', { class: 'note' }, 'Keyboard: W / ↑ gas, S / ↓ brake then reverse, A D / ← → steer, Space handbrake, Shift boost, C camera, T car settings, R reset, Esc exit. On a phone, use the on-screen pedals and steering buttons.'));
     dr.append(gDr);
 
     this.sync();

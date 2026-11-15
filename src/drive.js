@@ -2,7 +2,7 @@
 // arcade bicycle-model physics with airborne phase, boost with flame jets, chase/driver/orbit cameras,
 // keyboard and multi-touch input.
 import * as THREE from 'three';
-import { VehiclePhysics } from './vehicle-physics.js';
+import { VehiclePhysics, TUNE_DEFAULTS, clampTune } from './vehicle-physics.js';
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
@@ -311,6 +311,7 @@ export class Drive {
     this._yAxis = new THREE.Vector3(0, 1, 0); this._xAxis = new THREE.Vector3(1, 0, 0);
     this._shk = new THREE.Vector3(); this._tmp = new THREE.Vector3(); this._tmp2 = new THREE.Vector3(); this._one = new THREE.Vector3(1, 1, 1);
     this.fov0 = camera.fov;
+    this.tune = { ...TUNE_DEFAULTS };    // live "Car settings", see TUNE_DEFS in vehicle-physics.js
     this.reset();
     this._bindKeys();
   }
@@ -327,6 +328,12 @@ export class Drive {
     this._camInit = false; this._shk.set(0, 0, 0);
     if (this.fx) this._fxHide();
     if (this.onToast) this.onToast(null);
+  }
+
+  // Apply (clamped) car settings; takes effect on the next fixed step / frame.
+  setTune(tune) {
+    this.tune = clampTune(tune);
+    if (this.physics) this.physics.setTune(this.tune);
   }
 
   // test / debug helper: put the van somewhere with some speed
@@ -594,6 +601,7 @@ export class Drive {
     if (!this.physics) {
       const heights = await VehiclePhysics.prepareTerrain(heightAt);
       this.physics = new VehiclePhysics(heightAt, this.wheels, this.obstacleColliders, heights);
+      this.physics.setTune(this.tune);
     }
     this.world.visible = true;
     this.active = true;
@@ -781,8 +789,9 @@ export class Drive {
     const gas = this.input('gas'), brake = this.input('brake'), boostKey = this.input('boost');
     if (!boostKey) this.boostLock = false;
     this.boosting = boostKey && !brake && !this.boostLock && this.boost > 0;
-    if (this.boosting) { this.boost = Math.max(0, this.boost - dt / 4); if (this.boost === 0) { this.boostLock = true; this.boosting = false; } }
-    else this.boost = Math.min(1, this.boost + dt / 6);
+    const tune = this.tune || TUNE_DEFAULTS;
+    if (this.boosting) { this.boost = Math.max(0, this.boost - dt / tune.bt); if (this.boost === 0) { this.boostLock = true; this.boosting = false; } }
+    else this.boost = Math.min(1, this.boost + dt / tune.bc);
     const r = this.physics.step({ gas, brake, boost: this.boosting, hand: this.input('hand'), left: this.input('left'), right: this.input('right') });
     this.v = r.speed; this.heading = r.heading;
     this.physics.applyVisual(this.van);
@@ -791,7 +800,7 @@ export class Drive {
     for (const w of this.wheels) {
       if (!w.node) continue;
       this._q1.setFromAxisAngle(this._xAxis, this.dist / w.r);
-      if (w.front) { this._q2.setFromAxisAngle(this._yAxis, this.physics.steer * 0.58 / (1 + this.v * this.v / 160)); this._q1.premultiply(this._q2); }
+      if (w.front) { this._q2.setFromAxisAngle(this._yAxis, this.physics.steer * this.physics.steerLimit(this.v)); this._q1.premultiply(this._q2); }
       w.node.quaternion.copy(this._q1).multiply(w.baseQuat);
     }
     if (!r.grounded) { this.air = true; this.airT += dt; this.airDist += Math.abs(this.v) * dt; }
@@ -977,7 +986,7 @@ export class Drive {
 
   _updateCamera(dt) {
     const cam = this.camera, bv = this.boostVis, eb = bv * bv * (3 - 2 * bv);
-    const fov = (this.camMode === 'driver' ? 62 : 50) + 22 * eb;
+    const tune = this.tune || TUNE_DEFAULTS, fov = tune.fv + (this.camMode === 'driver' ? 12 : 0) + tune.fk * eb;
     if (Math.abs(cam.fov - fov) > 1e-4) { cam.fov = fov; cam.updateProjectionMatrix(); }
     const fx = Math.sin(this.heading), fz = Math.cos(this.heading);
     const p = this.van.position;
@@ -985,7 +994,7 @@ export class Drive {
     if (this.camMode === 'chase') {
       // A portrait viewport has a much narrower horizontal field of view.
       const portraitDistance = clamp(1 / Math.sqrt(cam.aspect), 1, 1.65);
-      const back = (7.2 + Math.max(0, this.v) * 0.06 + 2.6 * eb) * portraitDistance;
+      const back = (tune.cd + Math.max(0, this.v) * 0.06 + 2.6 * eb) * portraitDistance;
       const des = new THREE.Vector3(p.x - fx * back, p.y + 2.7 + 0.4 * eb, p.z - fz * back);
       const ground = heightAt(des.x, des.z) + 1.2;
       des.y = Math.max(des.y, ground);

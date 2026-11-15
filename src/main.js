@@ -8,6 +8,7 @@ import { Finishes } from './finishes.js';
 import { Openings, findNode } from './openings.js';
 import { Environment, VanLights } from './environment.js';
 import { Drive, heightAt } from './drive.js';
+import { TUNE_PRESETS, compactTune } from './vehicle-physics.js';
 import { UI } from './ui.js';
 import { loadState, saveState, shareUrl, clearSaved } from './state.js';
 import { setMaxAnisotropy } from './textures.js';
@@ -117,9 +118,15 @@ app.set = (patch) => {
   requestRender();
 };
 
+// drive "Car settings": state.tune holds only non-default values; Drive clamps and applies them live
+app.setTune = patch => app.set({ tune: compactTune({ ...app.state.tune, ...patch }) });
+app.resetTune = () => app.set({ tune: {} });
+app.applyTunePreset = id => { const p = TUNE_PRESETS.find(x => x.id === id); if (p) app.set({ tune: compactTune(p.values) }); };
+
 function applyState(keys) {
   const s = app.state, f = app.finishes;
   const has = k => !keys || keys.includes(k);
+  if (has('tune') && app.drive) app.drive.setTune(s.tune);
   if (!f) return;
   if (has('paint') || has('finish')) f.setPaint(s.paint, s.finish);
   if (has('wood')) f.setWood(s.wood);
@@ -331,17 +338,23 @@ app.exitDrive = () => {
   env.blob.material.opacity = 0.85 * (1 - env.nightFactor * 0.5);
   document.body.classList.remove('driving');
   hud.hidden = true;
+  tunePanel.hidden = true;
   updateViewOffset();
   controls.enabled = true;
   updateLights();
   goView('exterior', true);
 };
+const tunePanel = document.getElementById('tune-panel'), tuneBtn = document.getElementById('btn-tune');
+const setTunePanel = open => { tunePanel.hidden = !open; tuneBtn.setAttribute('aria-expanded', String(open)); canvas.focus(); };
+tuneBtn.addEventListener('click', () => setTunePanel(tunePanel.hidden));
+document.getElementById('tune-close').addEventListener('click', () => setTunePanel(false));
 document.getElementById('btn-exit-drive').addEventListener('click', () => app.exitDrive());
 document.getElementById('btn-reset-car').addEventListener('click', () => { app.drive.reset(); app.drive._place(0); app.drive._snapCamera(); });
 camBtn.addEventListener('click', () => { camBtn.textContent = 'Camera: ' + app.drive.cycleCamera(); });
 window.addEventListener('keydown', e => {
   if (!app.drive || !app.drive.active) return;
-  if (e.code === 'Escape') app.exitDrive();
+  if (e.code === 'Escape') { if (!tunePanel.hidden) setTunePanel(false); else app.exitDrive(); }
+  else if (e.code === 'KeyT') setTunePanel(tunePanel.hidden);
   else if (e.code === 'KeyC') camBtn.textContent = 'Camera: ' + app.drive.cycleCamera();
   else if (e.code === 'KeyR') { app.drive.reset(); app.drive._place(0); app.drive._snapCamera(); }
 });

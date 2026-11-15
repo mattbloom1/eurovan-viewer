@@ -115,4 +115,5 @@ export const DEFAULTS = {
   hour: 14,
   headlights: false,
   cabin: true,
+  tune: {}, // drive "Car settings": only non-default values (see TUNE_DEFS in vehicle-physics.js)
 };

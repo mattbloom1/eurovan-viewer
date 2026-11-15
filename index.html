@@ -75,13 +75,18 @@
     <div id="drive-timer" hidden>0:00</div>
     <div id="drive-toast" aria-live="polite"></div>
     <div class="drive-top">
+      <button id="btn-tune" class="pill" aria-expanded="false" aria-controls="tune-panel">Tune</button>
       <button id="btn-cam" class="pill">Camera: chase</button>
       <button id="btn-reset-car" class="pill">Reset</button>
       <button id="btn-exit-drive" class="pill accent">Exit drive</button>
     </div>
+    <section id="tune-panel" aria-label="Car settings" hidden>
+      <div class="tn-head"><b>Car settings</b><button id="tune-close" class="tn-x" aria-label="Close car settings">&times;</button></div>
+      <div class="tn-body"></div>
+    </section>
     <details class="drive-help">
       <summary>Controls</summary>
-      <p>W / &uarr; gas &middot; S / &darr; brake and reverse &middot; A / D steer<br>Space handbrake &middot; Shift boost &middot; C camera &middot; R reset &middot; Esc exit</p>
+      <p>W / &uarr; gas &middot; S / &darr; brake and reverse &middot; A / D steer<br>Space handbrake &middot; Shift boost &middot; C camera &middot; T tune &middot; R reset &middot; Esc exit</p>
     </details>
     <div id="touch-drive">
       <div class="steer">
