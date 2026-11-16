@@ -1,9 +1,9 @@
 {
- "version": "v34",
- "exported": "2026-11-15T21:18:57-07:00",
- "source": "v34_copy.blend",
- "total_tris": 712138,
- "glb_bytes": 2678000,
+ "version": "v35",
+ "exported": "2026-11-15T23:32:49-07:00",
+ "source": "v35_copy.blend",
+ "total_tris": 716200,
+ "glb_bytes": 2712096,
  "bounds": {
   "min": [
    -1.0901,
@@ -35,7 +35,7 @@
   },
   {
    "name": "Interior",
-   "tris": 74794,
+   "tris": 74830,
    "bounds": {
     "min": [
      -0.8688,
@@ -67,7 +67,7 @@
   },
   {
    "name": "Buildout",
-   "tris": 148373,
+   "tris": 152371,
    "bounds": {
     "min": [
      -1.0268,
@@ -115,7 +115,7 @@
   },
   {
    "name": "BO_Concept_DI",
-   "tris": 94973,
+   "tris": 96945,
    "bounds": {
     "min": [
      -0.795,
@@ -131,7 +131,7 @@
   },
   {
    "name": "BO_Concept_R3L",
-   "tris": 17598,
+   "tris": 18698,
    "bounds": {
     "min": [
      -0.834,
@@ -179,11 +179,11 @@
   },
   {
    "name": "BO_Finishes_Safety",
-   "tris": 772,
+   "tris": 1626,
    "bounds": {
     "min": [
      -0.8189,
-     0.5155,
+     0.489,
      -2.295
     ],
     "max": [
@@ -227,7 +227,7 @@
   },
   {
    "name": "BO_Overhead_Lockers_Lighting",
-   "tris": 5674,
+   "tris": 5746,
    "bounds": {
     "min": [
      -1.0268,
@@ -247,12 +247,12 @@
    "bounds": {
     "min": [
      -0.7495,
-     0.7431,
+     0.7681,
      0.1666
     ],
     "max": [
      -0.056,
-     1.6497,
+     1.6747,
      0.9696
     ]
    }
@@ -323,7 +323,7 @@
   },
   {
    "name": "PopTop_Pivot",
-   "tris": 10394,
+   "tris": 10422,
    "bounds": {
     "min": [
      -0.668,
