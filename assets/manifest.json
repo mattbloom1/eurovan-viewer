@@ -1,9 +1,9 @@
 {
- "version": "v35",
- "exported": "2026-11-15T23:32:49-07:00",
- "source": "v35_copy.blend",
- "total_tris": 716200,
- "glb_bytes": 2712096,
+ "version": "v36",
+ "exported": "2026-11-16T00:07:41-07:00",
+ "source": "v36_copy.blend",
+ "total_tris": 719847,
+ "glb_bytes": 2758832,
  "bounds": {
   "min": [
    -1.0901,
@@ -67,7 +67,7 @@
   },
   {
    "name": "Buildout",
-   "tris": 152371,
+   "tris": 156018,
    "bounds": {
     "min": [
      -1.0268,
@@ -83,7 +83,7 @@
   },
   {
    "name": "BO_Bed_Base",
-   "tris": 448,
+   "tris": 516,
    "bounds": {
     "min": [
      -0.5415,
@@ -92,17 +92,17 @@
     ],
     "max": [
      -0.3345,
-     0.7629,
-     -0.3832
+     0.7633,
+     -0.3829
     ]
    }
   },
   {
    "name": "BO_Closet",
-   "tris": 2522,
+   "tris": 2526,
    "bounds": {
     "min": [
-     0.375,
+     0.3717,
      0.523,
      -1.308
     ],
@@ -115,7 +115,7 @@
   },
   {
    "name": "BO_Concept_DI",
-   "tris": 96945,
+   "tris": 99878,
    "bounds": {
     "min": [
      -0.795,
@@ -131,7 +131,7 @@
   },
   {
    "name": "BO_Concept_R3L",
-   "tris": 18698,
+   "tris": 18434,
    "bounds": {
     "min": [
      -0.834,
@@ -147,7 +147,7 @@
   },
   {
    "name": "BO_Electrics",
-   "tris": 3648,
+   "tris": 3900,
    "bounds": {
     "min": [
      0.44,
@@ -157,7 +157,7 @@
     "max": [
      0.775,
      1.612,
-     -1.31
+     -1.3215
     ]
    }
   },
@@ -195,7 +195,7 @@
   },
   {
    "name": "BO_Hitch_Carrier",
-   "tris": 1064,
+   "tris": 1000,
    "bounds": {
     "min": [
      -0.92,
@@ -211,7 +211,7 @@
   },
   {
    "name": "BO_Kitchen_Desk",
-   "tris": 6364,
+   "tris": 6980,
    "bounds": {
     "min": [
      0.3851,
@@ -227,7 +227,7 @@
   },
   {
    "name": "BO_Overhead_Lockers_Lighting",
-   "tris": 5746,
+   "tris": 5882,
    "bounds": {
     "min": [
      -1.0268,
@@ -243,12 +243,12 @@
   },
   {
    "name": "BO_Swivel_Seat_Table",
-   "tris": 8398,
+   "tris": 8364,
    "bounds": {
     "min": [
      -0.7495,
      0.7681,
-     0.1666
+     0.1668
     ],
     "max": [
      -0.056,
