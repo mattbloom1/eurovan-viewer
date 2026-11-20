@@ -1,18 +1,18 @@
 {
- "version": "v39",
- "exported": "2026-11-20T14:04:01-07:00",
- "source": "v39_copy.blend",
- "total_tris": 720803,
- "glb_bytes": 2757008,
+ "version": "v40",
+ "exported": "2026-11-20T14:38:31-07:00",
+ "source": "v40_copy.blend",
+ "total_tris": 713337,
+ "glb_bytes": 2723316,
  "bounds": {
   "min": [
    -1.0901,
-   -1.2832,
+   0.0002,
    -2.92
   ],
   "max": [
    1.0903,
-   2.101,
+   1.9849,
    2.3811
   ]
  },
@@ -67,15 +67,15 @@
   },
   {
    "name": "Buildout",
-   "tris": 159411,
+   "tris": 154561,
    "bounds": {
     "min": [
-     -1.0268,
-     -1.2832,
+     -0.92,
+     0.2895,
      -2.92
     ],
     "max": [
-     0.9593,
+     0.92,
      1.873,
      1.77
     ]
@@ -115,7 +115,7 @@
   },
   {
    "name": "BO_Concept_DI",
-   "tris": 103486,
+   "tris": 100916,
    "bounds": {
     "min": [
      -0.795,
@@ -123,7 +123,7 @@
      -2.27
     ],
     "max": [
-     0.9593,
+     0.8233,
      1.873,
      1.77
     ]
@@ -227,31 +227,31 @@
   },
   {
    "name": "BO_Overhead_Lockers_Lighting",
-   "tris": 5882,
+   "tris": 5126,
    "bounds": {
     "min": [
-     -1.0268,
-     -1.2832,
+     -0.725,
+     1.459,
      -2.044
     ],
     "max": [
      0.6789,
-     1.863,
+     1.854,
      -0.0553
     ]
    }
   },
   {
    "name": "BO_Swivel_Seat_Table",
-   "tris": 8367,
+   "tris": 6843,
    "bounds": {
     "min": [
      -0.7495,
-     0.7785,
-     0.1668
+     0.785,
+     0.3028
     ],
     "max": [
-     -0.056,
+     -0.13,
      1.6851,
      0.9696
     ]
@@ -323,7 +323,7 @@
   },
   {
    "name": "PopTop_Pivot",
-   "tris": 10196,
+   "tris": 7580,
    "bounds": {
     "min": [
      -0.668,
@@ -332,7 +332,7 @@
     ],
     "max": [
      0.668,
-     2.101,
+     1.9849,
      1.038
     ]
    }
@@ -771,18 +771,6 @@
    "has_uv": true
   },
   {
-   "name": "BO_Fan_Smoke",
-   "color": [
-    0.05,
-    0.05,
-    0.055
-   ],
-   "metallic": 0.0,
-   "roughness": 0.2,
-   "alpha": 1.0,
-   "has_uv": false
-  },
-  {
    "name": "BO_Felt_Wall",
    "color": [
     0.5,
@@ -947,18 +935,6 @@
    ],
    "metallic": 0.0,
    "roughness": 0.42,
-   "alpha": 1.0,
-   "has_uv": true
-  },
-  {
-   "name": "BO_Perforated_Grille",
-   "color": [
-    0.02,
-    0.02,
-    0.022
-   ],
-   "metallic": 0.6,
-   "roughness": 0.5,
    "alpha": 1.0,
    "has_uv": true
   },
