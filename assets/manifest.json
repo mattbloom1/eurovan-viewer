@@ -1,9 +1,9 @@
 {
- "version": "v36",
- "exported": "2026-11-16T00:07:41-07:00",
- "source": "v36_copy.blend",
- "total_tris": 719847,
- "glb_bytes": 2758832,
+ "version": "v37",
+ "exported": "2026-11-20T08:46:53-07:00",
+ "source": "v37_copy.blend",
+ "total_tris": 717579,
+ "glb_bytes": 2749244,
  "bounds": {
   "min": [
    -1.0901,
@@ -19,7 +19,7 @@
  "nodes": [
   {
    "name": "Body",
-   "tris": 270284,
+   "tris": 270031,
    "bounds": {
     "min": [
      -0.9235,
@@ -35,12 +35,12 @@
   },
   {
    "name": "Interior",
-   "tris": 74830,
+   "tris": 72328,
    "bounds": {
     "min": [
      -0.8688,
      0.4266,
-     -2.3212
+     -2.3209
     ],
     "max": [
      0.8561,
@@ -67,7 +67,7 @@
   },
   {
    "name": "Buildout",
-   "tris": 156018,
+   "tris": 156187,
    "bounds": {
     "min": [
      -1.0268,
@@ -115,7 +115,7 @@
   },
   {
    "name": "BO_Concept_DI",
-   "tris": 99878,
+   "tris": 100047,
    "bounds": {
     "min": [
      -0.795,
@@ -307,7 +307,7 @@
   },
   {
    "name": "Tailgate_Pivot",
-   "tris": 38197,
+   "tris": 38741,
    "bounds": {
     "min": [
      -0.8821,
@@ -316,14 +316,14 @@
     ],
     "max": [
      0.8819,
-     1.8711,
-     -2.0455
+     1.883,
+     -2.0452
     ]
    }
   },
   {
    "name": "PopTop_Pivot",
-   "tris": 10422,
+   "tris": 10196,
    "bounds": {
     "min": [
      -0.668,
@@ -460,8 +460,8 @@
    "name": "Tailgate_Pivot",
    "position": [
     0.0,
-    1.878,
-    -2.05
+    1.8765,
+    -2.16
    ],
    "type": "hinge",
    "axis": [
