@@ -1,9 +1,9 @@
 {
- "version": "v37",
- "exported": "2026-11-20T08:46:53-07:00",
- "source": "v37_copy.blend",
- "total_tris": 717579,
- "glb_bytes": 2749244,
+ "version": "v38",
+ "exported": "2026-11-20T09:24:23-07:00",
+ "source": "v38_copy.blend",
+ "total_tris": 717100,
+ "glb_bytes": 2747024,
  "bounds": {
   "min": [
    -1.0901,
@@ -67,7 +67,7 @@
   },
   {
    "name": "Buildout",
-   "tris": 156187,
+   "tris": 155708,
    "bounds": {
     "min": [
      -1.0268,
@@ -115,7 +115,7 @@
   },
   {
    "name": "BO_Concept_DI",
-   "tris": 100047,
+   "tris": 99783,
    "bounds": {
     "min": [
      -0.795,
@@ -131,7 +131,7 @@
   },
   {
    "name": "BO_Concept_R3L",
-   "tris": 18434,
+   "tris": 18350,
    "bounds": {
     "min": [
      -0.834,
@@ -211,7 +211,7 @@
   },
   {
    "name": "BO_Kitchen_Desk",
-   "tris": 6980,
+   "tris": 6846,
    "bounds": {
     "min": [
      0.3851,
@@ -243,16 +243,16 @@
   },
   {
    "name": "BO_Swivel_Seat_Table",
-   "tris": 8364,
+   "tris": 8367,
    "bounds": {
     "min": [
      -0.7495,
-     0.7681,
+     0.7785,
      0.1668
     ],
     "max": [
      -0.056,
-     1.6747,
+     1.6851,
      0.9696
     ]
    }
