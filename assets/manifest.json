@@ -1,9 +1,9 @@
 {
- "version": "v38",
- "exported": "2026-11-20T09:24:23-07:00",
- "source": "v38_copy.blend",
- "total_tris": 717100,
- "glb_bytes": 2747024,
+ "version": "v39",
+ "exported": "2026-11-20T14:04:01-07:00",
+ "source": "v39_copy.blend",
+ "total_tris": 720803,
+ "glb_bytes": 2757008,
  "bounds": {
   "min": [
    -1.0901,
@@ -67,7 +67,7 @@
   },
   {
    "name": "Buildout",
-   "tris": 155708,
+   "tris": 159411,
    "bounds": {
     "min": [
      -1.0268,
@@ -115,7 +115,7 @@
   },
   {
    "name": "BO_Concept_DI",
-   "tris": 99783,
+   "tris": 103486,
    "bounds": {
     "min": [
      -0.795,
